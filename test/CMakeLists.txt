@@ -9,7 +9,7 @@ add_executable(test_panoramix
         )
 
 target_compile_definitions(test_panoramix
-        PRIVATE fixtures_path="${CMAKE_CURRENT_SOURCE_DIR}/../data"
+        PRIVATE fixtures_path="${CMAKE_CURRENT_SOURCE_DIR}/fixtures"
         )
 
 set (CMAKE_CXX_FLAGS -DELPP_THREAD_SAFE)
