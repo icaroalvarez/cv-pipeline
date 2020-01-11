@@ -8,3 +8,7 @@ set(source_files
 add_library(panoramix
         ${source_files}
         )
+
+target_link_libraries(panoramix PRIVATE
+        opencv_core
+        opencv_highgui)

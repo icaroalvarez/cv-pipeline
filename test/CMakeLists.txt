@@ -16,5 +16,5 @@ target_include_directories(test_panoramix PRIVATE
         ../src)
 
 target_compile_definitions(test_panoramix
-        PRIVATE fixtures_path="${CMAKE_CURRENT_SOURCE_DIR}/fixtures"
+        PRIVATE fixtures_path="${CMAKE_CURRENT_SOURCE_DIR}/fixtures/"
         )
