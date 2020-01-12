@@ -1,10 +1,11 @@
 #pragma once
 #include "ImageProcessor.h"
 #include "Factory.h"
+#include "Notifier.h"
 #include <any>
 #include <opencv2/core/mat.hpp>
 
-class PipelineController
+class PipelineController: public Notifier
 {
 public:
 
@@ -13,6 +14,18 @@ public:
     void loadImage(const std::string &path);
 
     void configureProcessor(unsigned int index, const Configuration& configuration);
+
+    void processCurrentImage();
+
+    void addImageProcessor(std::unique_ptr<ImageProcessor> imageProcessor);
+
+    cv::Mat getCurrentLoadedImage();
+
+    cv::Mat getPreProcessedImage(unsigned int processorIndex);
+
+    cv::Mat getPostProcessedImage(unsigned int processorIndex);
+
+    cv::Mat getDebugImage(unsigned int processorIndex);
 
     template <typename T>
     void registerImageProcessor(const std::string& processorName)

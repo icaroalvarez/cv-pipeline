@@ -11,6 +11,7 @@ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
 find_package(OpenCV REQUIRED COMPONENTS core highgui)
+find_package(Threads)
 
 add_subdirectory(src)
 add_subdirectory(test)

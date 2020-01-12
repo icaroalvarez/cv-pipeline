@@ -1,4 +1,5 @@
 #include <opencv2/imgcodecs.hpp>
+#include <thread>
 #include "PipelineController.h"
 
 void PipelineController::loadPipeline(const std::vector<std::string>& imageProcessorNames)
@@ -31,15 +32,62 @@ void PipelineController::loadImage(const std::string &path)
     }
 }
 
-void PipelineController::configureProcessor(unsigned int index,
-                                            const Configuration& configuration)
+void checkImageProcessorRange(const std::vector<std::unique_ptr<ImageProcessor>>& imageProcessors,
+                              unsigned int index,
+            const std::string& exceptionMessage)
 {
     if(index >= imageProcessors.size())
     {
-        throw std::invalid_argument("Couldn't configure the image processor. The index "
+        throw std::invalid_argument(exceptionMessage
                                     +std::to_string(index)+" is out of range ("
                                     +std::to_string(imageProcessors.size())+")");
     }
+}
 
+void PipelineController::configureProcessor(unsigned int index,
+                                            const Configuration& configuration)
+{
+    checkImageProcessorRange(imageProcessors, index, "Couldn't configure the image processor. ");
     imageProcessors[index]->configure(configuration);
+}
+
+void PipelineController::processCurrentImage()
+{
+    std::thread([=]
+                {
+                    for(const auto& processor: imageProcessors)
+                    {
+                        processor->processImage(currentImage);
+                    }
+                    notifyObservers();
+                }).detach();
+
+}
+
+void PipelineController::addImageProcessor(std::unique_ptr<ImageProcessor> imageProcessor)
+{
+    imageProcessors.emplace_back(std::move(imageProcessor));
+}
+
+cv::Mat PipelineController::getCurrentLoadedImage()
+{
+    return currentImage;
+}
+
+cv::Mat PipelineController::getPreProcessedImage(unsigned int processorIndex)
+{
+    checkImageProcessorRange(imageProcessors, processorIndex, "Couldn't get pre processed image. ");
+    return imageProcessors[processorIndex]->getPreProcessedImage();
+}
+
+cv::Mat PipelineController::getPostProcessedImage(unsigned int processorIndex)
+{
+    checkImageProcessorRange(imageProcessors, processorIndex, "Couldn't get post processed image. ");
+    return imageProcessors[processorIndex]->getPostProcessedImage();
+}
+
+cv::Mat PipelineController::getDebugImage(unsigned int processorIndex)
+{
+    checkImageProcessorRange(imageProcessors, processorIndex, "Couldn't debug image. ");
+    return imageProcessors[processorIndex]->getDebugImage();
 }

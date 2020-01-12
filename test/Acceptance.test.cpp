@@ -1,10 +1,14 @@
 #include <any>
+#include <Observer.h>
+#include <thread>
 #include "trompeloeil.hpp"
 #include "catch2/catch.hpp"
 #include "PipelineController.h"
 
 class MockProcessor1: public ImageProcessor
 {
+public:
+    MAKE_MOCK1(processImage, void(cv::Mat), override);
 };
 
 class MockProcessor2: public ImageProcessor
@@ -14,6 +18,8 @@ public:
     {
         getConfiguration()["parameter_1"] = 1;
     }
+
+    MAKE_MOCK1(processImage, void(cv::Mat), override);
 };
 
 SCENARIO("An image processor pipeline can be loaded")
@@ -114,30 +120,53 @@ SCENARIO("A pipeline's image processor can be configured")
     }
 }
 
-//SCENARIO("An image from frame source can be processed through the pipeline")
-//{
-//    GIVEN("A pipeline and a frame source are already loaded")
-//    {
-//        const auto controller{createPipelineController()};
-//
-//        WHEN("An observer is registered and an image is fired to be processed")
-//        {
-//            MockObserver mockObserver;
-//            controller->addObserver(mockObserver);
-//            controller->fireNextImage();
-//
-//            THEN("The observer is notified when the image is processed by all image processors")
-//            {
-//
-//                AND_THEN("The original, pre-processed, post-processed and debug images can be retrieved from an image processor")
-//                {
-//                    const auto originalImage{controller->getOriginalImage()};
-//                    constexpr auto processorIndex{1};
-//                    const auto preProcessedImage{controller->getPreprocessedImage(processorIndex)};
-//                    const auto postProcessedImage{controller->getPostProcessedImage(processorIndex)};
-//                    const auto debugImage{controller->getDebugImage(processorIndex)};
-//                }
-//            }
-//        }
-//    }
-//}
+class MockObserver: public Observer
+{
+public:
+    MAKE_MOCK0(update, void(), override);
+};
+
+SCENARIO("An image from frame source can be processed through the pipeline")
+{
+    GIVEN("A pipeline and a frame source are already loaded")
+    {
+        auto controller{std::make_unique<PipelineController>()};
+        auto imageProcessor1{std::make_unique<MockProcessor1>()};
+        REQUIRE_CALL(*imageProcessor1, processImage(trompeloeil::_));
+        auto imageProcessor2{std::make_unique<MockProcessor1>()};
+        REQUIRE_CALL(*imageProcessor2, processImage(trompeloeil::_));
+        controller->addImageProcessor(std::move(imageProcessor1));
+        controller->addImageProcessor(std::move(imageProcessor2));
+
+        constexpr auto frameSourcePath{fixtures_path"Lenna.png"};
+        controller->loadImage(frameSourcePath);
+
+        WHEN("An observer is registered and an image is fired to be processed")
+        {
+            auto mockObserver{std::make_shared<MockObserver>()};
+            std::atomic_bool observerUpdated{false};
+            REQUIRE_CALL(*mockObserver, update())
+                    .LR_SIDE_EFFECT(observerUpdated = true);
+
+            controller->registerObserver(mockObserver);
+            controller->processCurrentImage();
+
+            THEN("The observer is notified when the image is processed by all image processors")
+            {
+                while(!observerUpdated)
+                {
+                    std::this_thread::sleep_for(std::chrono::microseconds(100));
+                }
+
+                AND_THEN("The original, pre-processed, post-processed and debug images can be retrieved from an image processor")
+                {
+                    const auto originalImage{controller->getCurrentLoadedImage()};
+                    constexpr auto processorIndex{1};
+                    const auto preProcessedImage{controller->getPreProcessedImage(processorIndex)};
+                    const auto postProcessedImage{controller->getPostProcessedImage(processorIndex)};
+                    const auto debugImage{controller->getDebugImage(processorIndex)};
+                }
+            }
+        }
+    }
+}
