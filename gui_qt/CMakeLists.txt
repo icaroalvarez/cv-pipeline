@@ -11,8 +11,7 @@ endif()
 
 # Instruct CMake to run moc automatically when needed.
 set(CMAKE_AUTOMOC ON)
-# Find the QtWidgets library
-set(CMAKE_PREFIX_PATH /Users/icaro/Qt/5.10.0/clang_64/lib/cmake/Qt5Widgets)
+
 find_package(Qt5Widgets)
 
 set(source_files
@@ -21,7 +20,6 @@ set(source_files
         qlabelmat
         qwidgethandler
         ProcessorWidget
-        Utils
         FrameSourceNavigationWidget)
 
 set(FORMS
@@ -29,28 +27,11 @@ set(FORMS
         )
 qt5_wrap_ui(FORM_H ${FORMS})
 
-# Add the include directories for the Qt 5 Widgets module to
-# the compile lines.
-#include_directories(${Qt5Widgets_INCLUDE_DIRS})
-
-# Use the compile definitions defined in the Qt 5 Widgets module
-#add_definitions(${Qt5Widgets_DEFINITIONS})
-
-# Add compiler flags for building executables (-fPIE)
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
-
-#qt5_generate_moc(main.cpp main.moc)
-
-#add_library(playground_gui ${tst_hdr_moc} ${tst_form_hdr})
-#qt5_use_modules(mainwindow Widgets)
-
 # Tell CMake to create the helloworld executable
 add_executable(gui
         ${source_files}
         ${FORM_H}
         ${LOGGING_SOURCES_FILES})
-
-#qt5_use_modules(playground_gui Core Gui Widgets)
 
 find_package( OpenCV REQUIRED )
 
@@ -63,7 +44,6 @@ add_subdirectory(3rd-party)
 target_include_directories(gui PRIVATE
         ../src
         ../image_processors
-        #easylogging
         )
 
 #Make a top-level <target> depend on other top-level targets to ensure that they build before <target> does

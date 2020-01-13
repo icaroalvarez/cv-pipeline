@@ -14,9 +14,6 @@ public:
 
 private:
     PipelineController *controller;
-    QComboBox comboBoxProcessors;
-    QString processorName;
-    QWidget configurationWidget;
     QLabelMat imageLabel;
     QWidgetHandler widgetHandler;
     int indexTab;

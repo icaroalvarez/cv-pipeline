@@ -24,13 +24,11 @@ MainWindow::MainWindow(QWidget *parent) :
     const std::vector<std::string> pipeLineDescription{"roi",  "resize"};
     controller.loadPipeline(pipeLineDescription);
 
-    // get loaded processors
-
     // create tabs with each processors processor
     for(auto &processor : pipeLineDescription)
     {
         // add processor widget
-        ProcessorWidget *processorWidget = new ProcessorWidget(&controller, tabWidget.count());
+        auto* processorWidget = new ProcessorWidget(&controller, tabWidget.count());
         tabWidget.addTab(processorWidget, QString::fromStdString(processor));
     }
 
@@ -55,7 +53,8 @@ void MainWindow::update() {
     for(int iTab = 0; iTab < tabWidget.count(); iTab++)
     {
         try {
-            static_cast<ProcessorWidget *>(tabWidget.widget(iTab))->setDebugImage(controller.getDebugImage(iTab));
+            dynamic_cast<ProcessorWidget *>(tabWidget.widget(iTab))->setDebugImage(controller.getDebugImage(
+                    static_cast<unsigned int>(iTab)));
         }catch(const std::exception& e)
         {
             LOG(WARNING) << e.what();

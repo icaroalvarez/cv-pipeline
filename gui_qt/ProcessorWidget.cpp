@@ -1,7 +1,3 @@
-//
-// Created by ialvarez on 22/02/18.
-//
-
 #include <iostream>
 #include <QHBoxLayout>
 #include "ProcessorWidget.h"
@@ -19,7 +15,7 @@ ProcessorWidget::ProcessorWidget(PipelineController *controller, int indexTab)
     this->layout()->addWidget(&imageLabel);
 
     // get processor configuration
-    auto configuration = controller->getProcessorConfigurationFrom(indexTab);
+    auto configuration = controller->getProcessorConfigurationFrom(static_cast<unsigned int>(indexTab));
 
     // add configuration widget
     this->layout()->addWidget(widgetHandler.createQWidgetFromJson(configuration));
@@ -34,8 +30,7 @@ ProcessorWidget::ProcessorWidget(PipelineController *controller, int indexTab)
 
 void ProcessorWidget::configureProcessor(QString paramName, QVariant value)
 {
-    json configuration;
-    json parameter = {{"name", paramName.toStdString()}};
+    json parameter{{"name", paramName.toStdString()}};
 
     if(!std::string(value.typeName()).compare("int"))
     {
@@ -53,10 +48,11 @@ void ProcessorWidget::configureProcessor(QString paramName, QVariant value)
         throw std::invalid_argument("Processor widget receive unknown parameter: "+std::string(value.typeName()));
     }
 
+    json configuration;
     configuration.push_back(parameter);
 
     // configure processor
-    controller->configureProcessor(indexTab, configuration);
+    controller->configureProcessor(static_cast<unsigned int>(indexTab), configuration);
 
     // fire new process
     controller->processCurrentImage();
