@@ -15,3 +15,5 @@ find_package(Threads)
 
 add_subdirectory(src)
 add_subdirectory(test)
+add_subdirectory(image_processors)
+add_subdirectory(gui_qt)
