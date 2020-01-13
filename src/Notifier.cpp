@@ -8,12 +8,12 @@ void Notifier::notifyObservers()
     }
 }
 
-void Notifier::registerObserver(std::shared_ptr<Observer> observer)
+void Notifier::registerObserver(Observer* observer)
 {
     observerList.push_back(observer);
 }
 
-void Notifier::unregisterObserver(std::shared_ptr<Observer> observer)
+void Notifier::unregisterObserver(Observer* observer)
 {
     observerList.remove(observer);
 }

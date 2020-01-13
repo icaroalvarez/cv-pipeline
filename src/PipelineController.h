@@ -13,7 +13,9 @@ public:
 
     void loadImage(const std::string &path);
 
-    void configureProcessor(unsigned int index, const Configuration& configuration);
+    void configureProcessor(unsigned int index, const nlohmann::json& configuration);
+
+    nlohmann::json getProcessorConfigurationFrom(unsigned int processorIndex) const;
 
     void processCurrentImage();
 

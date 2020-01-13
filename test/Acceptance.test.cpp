@@ -14,11 +14,6 @@ public:
 class MockProcessor2: public ImageProcessor
 {
 public:
-    MockProcessor2()
-    {
-        getConfiguration()["parameter_1"] = 1;
-    }
-
     MAKE_MOCK1(processImage, void(cv::Mat), override);
 };
 
