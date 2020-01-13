@@ -55,9 +55,11 @@ void PipelineController::processCurrentImage()
 {
     std::thread([=]
                 {
+                    cv::Mat imageFromPreviousProcessor{currentImage};
                     for(const auto& processor: imageProcessors)
                     {
-                        processor->processImage(currentImage);
+                        processor->processImage(imageFromPreviousProcessor);
+                        imageFromPreviousProcessor = processor->getPostProcessedImage();                        
                     }
                     notifyObservers();
                 }).detach();
