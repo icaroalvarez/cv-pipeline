@@ -143,7 +143,7 @@ SCENARIO("An image from frame source can be processed through the pipeline")
             REQUIRE_CALL(*mockObserver, update())
                     .LR_SIDE_EFFECT(observerUpdated = true);
 
-            controller->registerObserver(mockObserver);
+            controller->registerObserver(mockObserver.get());
             controller->processCurrentImage();
 
             THEN("The observer is notified when the image is processed by all image processors")
