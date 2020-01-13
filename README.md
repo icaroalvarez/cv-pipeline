@@ -5,6 +5,11 @@ Tool for graphically testing computer vision image processors.
 ## Installing external dependencies
 
 ### Dependencies managed by conan
+- Catch2
+- Trompeloeil
+- Json
+
+Run the following commands for install the dependencies:
 
 ```bash
 mkdir build && cd build
@@ -12,7 +17,9 @@ conan install ..
 ```
 
 ### Other dependencies
-- OpenCV 3 and Qt5 must been manually installed in the system
+Install this dependencies manually in the system: 
+- OpenCV 3
+- Qt5
 
 ## Building the project
 

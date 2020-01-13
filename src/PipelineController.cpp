@@ -38,7 +38,7 @@ void checkImageProcessorRange(const std::vector<std::unique_ptr<ImageProcessor>>
 {
     if(index >= imageProcessors.size())
     {
-        throw std::invalid_argument(exceptionMessage
+        throw std::invalid_argument(exceptionMessage+"The index "
                                     +std::to_string(index)+" is out of range ("
                                     +std::to_string(imageProcessors.size())+")");
     }

@@ -14,6 +14,10 @@ public:
 class MockProcessor2: public ImageProcessor
 {
 public:
+    MockProcessor2()
+    {
+        getConfiguration().addIntParameter("parameter_1", 1, 0, 100);
+    }
     MAKE_MOCK1(processImage, void(cv::Mat), override);
 };
 
@@ -97,7 +101,10 @@ SCENARIO("A pipeline's image processor can be configured")
             constexpr auto imageProcessorIndex{1};
             constexpr auto parameterName{"non_existing_parameter"};
             constexpr auto parameterName2{"non_existing_parameter_2"};
-            std::unordered_map<std::string, int> configuration{{parameterName, 1}, {parameterName2, 2}};
+            nlohmann::json configuration{
+                {{"name", parameterName},{"value", 1}},
+                {{"name", parameterName2},{"value", 2}},
+            };
             const auto exceptionMessage{std::string{"Couldn't configure image processor. Parameters not found: "}
                                         +parameterName+", "+parameterName2};
             CHECK_THROWS_WITH(controller->configureProcessor(imageProcessorIndex, configuration),
@@ -109,7 +116,9 @@ SCENARIO("A pipeline's image processor can be configured")
         {
             constexpr auto imageProcessorIndex{1};
             constexpr auto parameterName{"parameter_1"};
-            std::unordered_map<std::string, int> configuration{{parameterName, 1}};
+            nlohmann::json configuration{
+                    {{"name", parameterName},{"value", 1}},
+            };
             CHECK_NOTHROW(controller->configureProcessor(imageProcessorIndex, configuration));
         }
     }

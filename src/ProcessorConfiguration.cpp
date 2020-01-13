@@ -62,18 +62,32 @@ void ProcessorConfiguration::configure(const nlohmann::json &parameters)
         throw std::invalid_argument("Configuration parameters is not an array of parameter objects");
     }
 
+    std::string incorrectParameters;
     for(auto& parameter: parameters)
     {
         std::string paramName = parameter["name"];
 
         // search for the parameter to update
+        auto parameterFound{false};
         for(auto& configurationParameter: configuration)
         {
             if(configurationParameter["name"] == paramName)
             {
                 configurationParameter["value"] = parameter["value"];
+                parameterFound = true;
             }
         }
+        if(not parameterFound)
+        {
+            incorrectParameters.append(paramName+", ");
+        }
+    }
+
+    if(incorrectParameters.size() > 2)
+    {
+        incorrectParameters.pop_back();
+        incorrectParameters.pop_back();
+        throw(std::invalid_argument("Couldn't configure image processor. Parameters not found: "+incorrectParameters));
     }
 }
 
