@@ -4,7 +4,7 @@ set(source_files
         ResizeImage
         Roi
         Mosaic
-        )
+        Registerer)
 
 add_library(image_processors
         ${source_files}

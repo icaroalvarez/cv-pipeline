@@ -2,8 +2,7 @@
 #include "ui_mainwindow.h"
 #include "ProcessorWidget.h"
 #include "easylogging++.h"
-#include "ResizeImage.h"
-#include "Roi.h"
+#include "Registerer.h"
 
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent),
@@ -17,8 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->centralWidget->layout()->setSizeConstraint(QLayout::SetMinimumSize);
 
     //register processors
-    controller.registerImageProcessor<RoiProcessor>("roi");
-    controller.registerImageProcessor<ResizeImage>("resize");
+    Registerer::registerProcessors(controller);
 
     // set processors
     const std::vector<std::string> pipeLineDescription{"roi",  "resize"};

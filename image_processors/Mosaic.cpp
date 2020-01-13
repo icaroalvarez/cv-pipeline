@@ -35,7 +35,8 @@ cv::Mat Mosaic::createMosaic() const {
     return mosaic;
 }
 
-void Mosaic::addImage(const cv::Mat &image, int col, int row, const std::string &imageName) {
+void Mosaic::addImage(const cv::Mat &image, int col, int row, const std::string &imageName)
+{
     pieces.push_back({image, col, row, imageName});
 }
 void Mosaic::reset()
