@@ -3,6 +3,7 @@
 #include "Roi.h"
 
 RoiProcessor::RoiProcessor()
+:ImageProcessor("roi")
 {
     getConfiguration().addIntParameter("top_left_x", 116, 0, 9999);
     getConfiguration().addIntParameter("top_left_y", 60, 0, 9999);

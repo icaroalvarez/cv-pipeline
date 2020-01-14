@@ -2,12 +2,12 @@
 #include "ui_mainwindow.h"
 #include "ProcessorWidget.h"
 #include "easylogging++.h"
-#include "Registerer.h"
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(PipelineController* pipelineController, QWidget *parent) :
         QMainWindow(parent),
         ui(new Ui::MainWindow),
-        frameSourceNavigation(&controller)
+        controller{pipelineController},
+        frameSourceNavigation(controller)
 {
     ui->setupUi(this);
 
@@ -15,18 +15,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->centralWidget->setLayout(new QHBoxLayout());
     ui->centralWidget->layout()->setSizeConstraint(QLayout::SetMinimumSize);
 
-    //register processors
-    Registerer::registerProcessors(controller);
-
-    // set processors
-    const std::vector<std::string> pipeLineDescription{"roi",  "resize"};
-    controller.loadPipeline(pipeLineDescription);
-
     // create tabs with each processors processor
-    for(auto &processor : pipeLineDescription)
+    for(auto &processor : controller->getPipelineDescription())
     {
         // add processor widget
-        auto* processorWidget = new ProcessorWidget(&controller, tabWidget.count());
+        auto* processorWidget = new ProcessorWidget(controller, tabWidget.count());
         tabWidget.addTab(processorWidget, QString::fromStdString(processor));
     }
 
@@ -39,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
     splitter->setStretchFactor(1, 5);
 
     // register main window as an observer of controller to be notified when image processing is finished
-    controller.registerObserver(this);
+    controller->registerObserver(this);
 }
 
 MainWindow::~MainWindow()
@@ -51,7 +44,7 @@ void MainWindow::update() {
     for(int iTab = 0; iTab < tabWidget.count(); iTab++)
     {
         try {
-            dynamic_cast<ProcessorWidget *>(tabWidget.widget(iTab))->setDebugImage(controller.getDebugImage(
+            dynamic_cast<ProcessorWidget *>(tabWidget.widget(iTab))->setDebugImage(controller->getDebugImage(
                     static_cast<unsigned int>(iTab)));
         }catch(const std::exception& e)
         {

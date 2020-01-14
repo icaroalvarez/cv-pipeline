@@ -23,6 +23,16 @@ void PipelineController::loadPipeline(const std::vector<std::string>& imageProce
     }
 }
 
+std::vector<std::string> PipelineController::getPipelineDescription() const
+{
+    std::vector<std::string> processorNames;
+    for (const auto &processor : imageProcessors)
+    {
+        processorNames.push_back(processor->getName());
+    }
+    return processorNames;
+}
+
 void PipelineController::loadImage(const std::string &path)
 {
     currentImage = cv::imread(path);

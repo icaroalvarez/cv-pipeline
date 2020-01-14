@@ -1,5 +1,10 @@
 #include "ImageProcessor.h"
 
+ImageProcessor::ImageProcessor(std::string name)
+:name{std::move(name)}
+{
+}
+
 ProcessorConfiguration& ImageProcessor::getConfiguration()
 {
     return configuration;
@@ -31,4 +36,8 @@ cv::Mat ImageProcessor::getDebugImage() const {
 void ImageProcessor::setDebugImage(cv::Mat image)
 {
     debugImage = std::move(image);
+}
+
+std::string ImageProcessor::getName() const {
+    return name;
 }

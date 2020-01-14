@@ -8,6 +8,9 @@
 class MockProcessor1: public ImageProcessor
 {
 public:
+    MockProcessor1()
+            : ImageProcessor("mock_processor_1"){};
+
     MAKE_MOCK1(processImage, void(cv::Mat), override);
 };
 
@@ -15,6 +18,7 @@ class MockProcessor2: public ImageProcessor
 {
 public:
     MockProcessor2()
+            :ImageProcessor("mock_processor_2")
     {
         getConfiguration().addIntParameter("parameter_1", 1, 0, 100);
     }
@@ -29,8 +33,8 @@ SCENARIO("An image processor pipeline can be loaded")
 
         WHEN("Two image processors are registered")
         {
-            controller.registerImageProcessor<MockProcessor1>("image_processor_1");
-            controller.registerImageProcessor<MockProcessor2>("image_processor_2");
+            controller.registerImageProcessor<MockProcessor1>("mock_processor_1");
+            controller.registerImageProcessor<MockProcessor2>("mock_processor_2");
 
             THEN("Fails loading a pipeline with not previously registered image processors.")
             {
@@ -42,8 +46,11 @@ SCENARIO("An image processor pipeline can be loaded")
 
             THEN("Load successfully a pipeline with previously registered image processors")
             {
-                const std::vector<std::string> pipeline{"image_processor_1", "image_processor_2"};
+                const std::vector<std::string> pipeline{"mock_processor_1", "mock_processor_2"};
                 CHECK_NOTHROW(controller.loadPipeline(pipeline));
+
+                const auto loadedPipelineDescription = controller.getPipelineDescription();
+                CHECK(loadedPipelineDescription == pipeline);
             }
         }
     }
@@ -102,8 +109,8 @@ SCENARIO("A pipeline's image processor can be configured")
             constexpr auto parameterName{"non_existing_parameter"};
             constexpr auto parameterName2{"non_existing_parameter_2"};
             nlohmann::json configuration{
-                {{"name", parameterName},{"value", 1}},
-                {{"name", parameterName2},{"value", 2}},
+                    {{"name", parameterName},{"value", 1}},
+                    {{"name", parameterName2},{"value", 2}},
             };
             const auto exceptionMessage{std::string{"Couldn't configure image processor. Parameters not found: "}
                                         +parameterName+", "+parameterName2};
@@ -150,7 +157,7 @@ SCENARIO("An image from frame source can be processed through the pipeline")
             auto mockObserver{std::make_shared<MockObserver>()};
             std::atomic_bool observerUpdated{false};
             REQUIRE_CALL(*mockObserver, update())
-                    .LR_SIDE_EFFECT(observerUpdated = true);
+            .LR_SIDE_EFFECT(observerUpdated = true);
 
             controller->registerObserver(mockObserver.get());
             controller->processCurrentImage();

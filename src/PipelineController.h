@@ -11,6 +11,8 @@ public:
 
     void loadPipeline(const std::vector<std::string>& imageProcessorNames);
 
+    std::vector<std::string> getPipelineDescription() const;
+
     void loadImage(const std::string& path);
 
     void configureProcessor(unsigned int index, const nlohmann::json& configuration);

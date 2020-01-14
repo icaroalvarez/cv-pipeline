@@ -4,6 +4,7 @@
 #include "ResizeImage.h"
 
 ResizeImage::ResizeImage()
+:ImageProcessor("resize")
 {
     getConfiguration().addFloatParameter("factor_x", 0.3, 0.1, 1.0, 0.1, 1);
     getConfiguration().addFloatParameter("factor_y", 0.3, 0.1, 1.0, 0.1, 1);
