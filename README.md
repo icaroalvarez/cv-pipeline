@@ -2,6 +2,8 @@
 
 Tool for graphically testing computer vision image processors.
 
+![Class diagram](./doc/screenshot.png)
+
 ## Installing external dependencies
 
 ### Dependencies managed by conan
