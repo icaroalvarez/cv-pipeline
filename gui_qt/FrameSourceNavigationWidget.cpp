@@ -5,10 +5,6 @@
 FrameSourceNavigationWidget::FrameSourceNavigationWidget(PipelineController *controller)
         :slider(Qt::Horizontal), controller(controller)
 {
-    // add frame source
-    std::string path("/home/ialvarez/Code/panoramix/test/fixtures/Lenna.png");
-    controller->loadImage(path);
-
     // add navigation slider
     slider.setMaximum(1);
 

@@ -13,6 +13,9 @@ int main(int argc, char *argv[]) {
     const std::vector<std::string> pipeLineDescription{"roi",  "resize"};
     controller.loadPipeline(pipeLineDescription);
 
+    std::string path("/home/ialvarez/Code/panoramix/test/fixtures/Lenna.png");
+    controller.loadImage(path);
+
     MainWindow window(&controller);
     window.show();
     window.setWindowState(Qt::WindowMaximized);
