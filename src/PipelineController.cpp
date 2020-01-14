@@ -64,7 +64,7 @@ void PipelineController::configureProcessor(unsigned int index,
 void PipelineController::processCurrentImage()
 {
     std::unique_lock<std::mutex> lock(processingImageMutex);
-    std::thread([=]
+    std::thread([&]
                 {
                     cv::Mat imageFromPreviousProcessor{currentImage};
                     for(const auto& processor: imageProcessors)
