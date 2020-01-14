@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 3.5)
 
 set(test_source_files
-        Acceptance.test.cpp
         main.test.cpp
-        Factory.test.cpp)
+        Acceptance.test.cpp
+        Factory.test.cpp
+        ProcessorConfiguration.Test.cpp
+        )
 
 add_executable(test_panoramix
         ${test_source_files}
