@@ -5,6 +5,11 @@
 #include <opencv2/core/mat.hpp>
 #include "ProcessorConfiguration.h"
 
+/**
+ * Responsibility: process an image.
+ * Base class for creating custom image processing implementations.
+ * Processor configuration is stored in this class.
+ */
 class ImageProcessor
 {
 public:

@@ -4,6 +4,12 @@
 #include <string>
 #include "nlohmann/json.hpp"
 
+/**
+ * Responsability: to manage the configuration of an image processor.
+ * Parameters can be added by type: int, float, boolean and options.
+ * Parameters can be configured using json format.
+ * Current configuration in json format can be retrieve.
+ */
 class ProcessorConfiguration {
 public:
 

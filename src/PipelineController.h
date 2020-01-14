@@ -6,7 +6,11 @@
 #include <opencv2/core/mat.hpp>
 
 /**
- *
+ * Responsability: allows to control the pipeline from the outside (a GUI for example).
+ * Image processors can be registered and loaded into the pipeline
+ * An image can be loaded and processed through the image processors loaded into the pipeline.
+ * The image processors loaded into the pipeline can be configured.
+ * Post-processed and debug images of each image processor can be retrieved. *
  */
 class PipelineController: public Notifier
 {
