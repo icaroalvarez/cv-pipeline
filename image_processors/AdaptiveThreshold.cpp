@@ -9,7 +9,7 @@ AdaptiveThreshold::AdaptiveThreshold()
 :ImageProcessor("adaptive_threshold")
 {
     getConfiguration().addIntParameter("block_size", 10, 1, 999);
-    getConfiguration().addIntParameter("c_mean", -15, -999, 999);
+    getConfiguration().addIntParameter("c_mean", -10, -999, 999);
     getConfiguration().addOptionsParameter("adaptive_method", {"mean", "gaussian"}, 0);
 }
 
@@ -23,9 +23,10 @@ int makeOdd(int value)
 
 void AdaptiveThreshold::processImage(const cv::Mat& image)
 {
+    cv::Mat imageGray{image};
     if(image.channels() > 1)
     {
-        throw std::invalid_argument("input image has more than 1 channel");
+        cv::cvtColor(image, imageGray, CV_RGB2GRAY);
     }
 
     int blockSize = makeOdd(getConfiguration().getIntParameter("block_size"));
@@ -37,7 +38,7 @@ void AdaptiveThreshold::processImage(const cv::Mat& image)
         option = cv::ADAPTIVE_THRESH_MEAN_C;
     }
     cv::Mat outputImage;
-    cv::adaptiveThreshold(image, outputImage, 255, option,
+    cv::adaptiveThreshold(imageGray, outputImage, 255, option,
             cv::THRESH_BINARY, blockSize, cMean);
 
     setDebugImage(outputImage);
