@@ -63,6 +63,7 @@ void PipelineController::configureProcessor(unsigned int index,
 
 void PipelineController::processCurrentImage()
 {
+    std::unique_lock<std::mutex> lock(processingImageMutex);
     std::thread([=]
                 {
                     cv::Mat imageFromPreviousProcessor{currentImage};
@@ -72,8 +73,7 @@ void PipelineController::processCurrentImage()
                         imageFromPreviousProcessor = processor->getPostProcessedImage();                        
                     }
                     notifyObservers();
-                }).detach();
-
+                }).join();
 }
 
 void PipelineController::addImageProcessor(std::unique_ptr<ImageProcessor> imageProcessor)

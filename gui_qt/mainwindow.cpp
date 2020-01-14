@@ -33,6 +33,8 @@ MainWindow::MainWindow(PipelineController* pipelineController, QWidget *parent) 
 
     // register main window as an observer of controller to be notified when image processing is finished
     controller->registerObserver(this);
+
+    frameSourceNavigation.sliderReleased();
 }
 
 MainWindow::~MainWindow()

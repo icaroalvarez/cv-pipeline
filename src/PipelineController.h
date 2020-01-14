@@ -4,6 +4,7 @@
 #include "Notifier.h"
 #include <any>
 #include <opencv2/core/mat.hpp>
+#include <mutex>
 
 /**
  * Responsability: allows to control the pipeline from the outside (a GUI for example).
@@ -94,4 +95,5 @@ private:
     std::vector<std::unique_ptr<ImageProcessor>> imageProcessors;
     Factory<ImageProcessor> imageProcessorFactory;
     cv::Mat currentImage;
+    std::mutex processingImageMutex;
 };
