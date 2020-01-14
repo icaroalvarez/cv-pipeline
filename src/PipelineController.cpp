@@ -86,12 +86,6 @@ cv::Mat PipelineController::getCurrentLoadedImage()
     return currentImage;
 }
 
-cv::Mat PipelineController::getPreProcessedImage(unsigned int processorIndex)
-{
-    checkImageProcessorRange(imageProcessors, processorIndex, "Couldn't get pre processed image. ");
-    return imageProcessors[processorIndex]->getPreProcessedImage();
-}
-
 cv::Mat PipelineController::getPostProcessedImage(unsigned int processorIndex)
 {
     checkImageProcessorRange(imageProcessors, processorIndex, "Couldn't get post processed image. ");

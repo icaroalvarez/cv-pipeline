@@ -11,7 +11,7 @@ RoiProcessor::RoiProcessor()
     getConfiguration().addIntParameter("height", 161, 0, 9999);
 }
 
-void RoiProcessor::processImage(cv::Mat image)
+void RoiProcessor::processImage(const cv::Mat &image)
 {
     mosaic.reset();
 

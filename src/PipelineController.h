@@ -25,8 +25,6 @@ public:
 
     cv::Mat getCurrentLoadedImage();
 
-    cv::Mat getPreProcessedImage(unsigned int processorIndex);
-
     cv::Mat getPostProcessedImage(unsigned int processorIndex);
 
     cv::Mat getDebugImage(unsigned int processorIndex);

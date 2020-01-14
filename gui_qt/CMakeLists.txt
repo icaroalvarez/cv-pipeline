@@ -20,7 +20,8 @@ set(source_files
         qlabelmat
         qwidgethandler
         ProcessorWidget
-        FrameSourceNavigationWidget)
+        FrameSourceNavigationWidget
+        )
 
 set(FORMS
         mainwindow.ui

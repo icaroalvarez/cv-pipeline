@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
 
     PipelineController controller;
     Registerer::registerProcessors(controller);
-    const std::vector<std::string> pipeLineDescription{"roi",  "resize"};
+    const std::vector<std::string> pipeLineDescription{"roi",  "resize", "color_space"};
     controller.loadPipeline(pipeLineDescription);
 
     std::string path("/home/ialvarez/Code/panoramix/test/fixtures/Lenna.png");

@@ -10,7 +10,7 @@
 class ResizeImage: public ImageProcessor {
 public:
     ResizeImage();
-    void processImage(cv::Mat image) override;
+    void processImage(const cv::Mat &image) override;
 };
 
 #endif //PLAYGROUND_RESIZEIMAGE_H

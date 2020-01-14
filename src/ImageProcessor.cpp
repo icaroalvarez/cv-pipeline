@@ -10,15 +10,6 @@ ProcessorConfiguration& ImageProcessor::getConfiguration()
     return configuration;
 }
 
-cv::Mat ImageProcessor::getPreProcessedImage() const {
-    return preProcessedImage;
-}
-
-void ImageProcessor::setPreProcessedImage(cv::Mat image)
-{
-    preProcessedImage = std::move(image);
-}
-
 cv::Mat ImageProcessor::getPostProcessedImage() const
 {
     return postProcessedImage;

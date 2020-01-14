@@ -12,10 +12,7 @@ public:
 
     ProcessorConfiguration& getConfiguration();
 
-    virtual void processImage(cv::Mat image) = 0;
-
-    cv::Mat getPreProcessedImage() const;
-    void setPreProcessedImage(cv::Mat image);
+    virtual void processImage(const cv::Mat &image) = 0;
 
     cv::Mat getPostProcessedImage() const;
     void setPostProcessedImage(cv::Mat image);
@@ -28,5 +25,5 @@ public:
 private:
     std::string name;
     ProcessorConfiguration configuration;
-    cv::Mat preProcessedImage, postProcessedImage, debugImage;
+    cv::Mat postProcessedImage, debugImage;
 };

@@ -4,7 +4,10 @@ set(source_files
         ResizeImage
         Roi
         Mosaic
-        Registerer)
+        Registerer
+        AdaptiveThreshold
+        ColorSpace
+        Convolution)
 
 add_library(image_processors
         ${source_files}
