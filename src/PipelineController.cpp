@@ -63,17 +63,7 @@ void PipelineController::configureProcessor(unsigned int index,
 
 void PipelineController::processCurrentImage()
 {
-    std::unique_lock<std::mutex> lock(processingImageMutex);
-    std::thread([&]
-                {
-                    cv::Mat imageFromPreviousProcessor{currentImage};
-                    for(const auto& processor: imageProcessors)
-                    {
-                        processor->processImage(imageFromPreviousProcessor);
-                        imageFromPreviousProcessor = processor->getPostProcessedImage();                        
-                    }
-                    notifyObservers();
-                }).join();
+    fireIteration();
 }
 
 void PipelineController::addImageProcessor(std::unique_ptr<ImageProcessor> imageProcessor)
@@ -101,4 +91,15 @@ cv::Mat PipelineController::getDebugImage(unsigned int processorIndex)
 nlohmann::json PipelineController::getProcessorConfigurationFrom(unsigned int processorIndex) const {
     checkImageProcessorRange(imageProcessors, processorIndex, "Couldn't get image processor configuration. ");
     return imageProcessors[processorIndex]->getConfiguration().getConfiguration();
+}
+
+void PipelineController::runIteration()
+{
+    cv::Mat imageFromPreviousProcessor{currentImage};
+    for(const auto& processor: imageProcessors)
+    {
+        processor->processImage(imageFromPreviousProcessor);
+        imageFromPreviousProcessor = processor->getPostProcessedImage();
+    }
+    notifyObservers();
 }

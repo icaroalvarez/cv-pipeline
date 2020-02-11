@@ -2,9 +2,9 @@
 #include "ImageProcessor.h"
 #include "Factory.h"
 #include "Notifier.h"
+#include "Runnable.h"
 #include <any>
 #include <opencv2/core/mat.hpp>
-#include <mutex>
 
 /**
  * Responsability: allows to control the pipeline from the outside (a GUI for example).
@@ -13,7 +13,7 @@
  * The image processors loaded into the pipeline can be configured.
  * Post-processed and debug images of each image processor can be retrieved. *
  */
-class PipelineController: public Notifier
+class PipelineController: public Notifier, Runnable
 {
 public:
 
@@ -95,5 +95,6 @@ private:
     std::vector<std::unique_ptr<ImageProcessor>> imageProcessors;
     Factory<ImageProcessor> imageProcessorFactory;
     cv::Mat currentImage;
-    std::mutex processingImageMutex;
+
+    void runIteration() override;
 };

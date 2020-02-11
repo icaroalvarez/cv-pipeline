@@ -7,7 +7,7 @@ set(source_files
         Observer
         Notifier
         ProcessorConfiguration
-        )
+        Runnable)
 
 add_library(panoramix
         ${source_files}

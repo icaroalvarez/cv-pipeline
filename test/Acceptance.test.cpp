@@ -11,7 +11,7 @@ public:
     MockProcessor1()
             : ImageProcessor("mock_processor_1"){};
 
-    MAKE_MOCK1(processImage, void(cv::Mat), override);
+    MAKE_MOCK1(processImage, void(const cv::Mat&), override);
 };
 
 class MockProcessor2: public ImageProcessor
@@ -22,7 +22,7 @@ public:
     {
         getConfiguration().addIntParameter("parameter_1", 1, 0, 100);
     }
-    MAKE_MOCK1(processImage, void(cv::Mat), override);
+    MAKE_MOCK1(processImage, void(const cv::Mat&), override);
 };
 
 SCENARIO("An image processor pipeline can be loaded")
@@ -44,7 +44,7 @@ SCENARIO("An image processor pipeline can be loaded")
                 CHECK_THROWS_WITH(controller.loadPipeline(pipeline), exceptionMessage);
             }
 
-            THEN("Load successfully a pipeline with previously registered image processors")
+            THEN("Successfully loads a pipeline with previously registered image processors")
             {
                 const std::vector<std::string> pipeline{"mock_processor_1", "mock_processor_2"};
                 CHECK_NOTHROW(controller.loadPipeline(pipeline));
@@ -173,7 +173,6 @@ SCENARIO("An image from frame source can be processed through the pipeline")
                 {
                     const auto originalImage{controller->getCurrentLoadedImage()};
                     constexpr auto processorIndex{1};
-                    const auto preProcessedImage{controller->getPreProcessedImage(processorIndex)};
                     const auto postProcessedImage{controller->getPostProcessedImage(processorIndex)};
                     const auto debugImage{controller->getDebugImage(processorIndex)};
                 }
