@@ -11,8 +11,10 @@ add_executable(test_panoramix
         ${test_source_files}
         )
 
-target_link_libraries(test_panoramix
-        panoramix)
+target_link_libraries(test_panoramix PRIVATE
+        panoramix
+        CONAN_PKG::trompeloeil
+        )
 
 target_include_directories(test_panoramix PRIVATE
         ../src)

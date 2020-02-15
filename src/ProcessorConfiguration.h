@@ -2,10 +2,11 @@
 #define PLAYGROUND_PROCESSORCONFIGURATION_H
 
 #include <string>
-#include "nlohmann/json.hpp"
+#include <vector>
+#include <nlohmann/json.hpp>
 
 /**
- * Responsability: to manage the configuration of an image processor.
+ * Responsibility: to manage the configuration of an image processor.
  * Parameters can be added by type: int, float, boolean and options.
  * Parameters can be configured using json format.
  * Current configuration in json format can be retrieve.

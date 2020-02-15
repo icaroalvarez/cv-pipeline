@@ -13,7 +13,8 @@ add_library(panoramix
         ${source_files}
         )
 
-target_link_libraries(panoramix PRIVATE
+target_link_libraries(panoramix PUBLIC
+        CONAN_PKG::jsonformoderncpp
         pthread
         opencv_core
         opencv_highgui)
