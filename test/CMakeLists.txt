@@ -14,6 +14,7 @@ add_executable(test_panoramix
 target_link_libraries(test_panoramix PRIVATE
         panoramix
         CONAN_PKG::trompeloeil
+        CONAN_PKG::Catch2
         )
 
 target_include_directories(test_panoramix PRIVATE
