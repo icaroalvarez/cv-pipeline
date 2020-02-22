@@ -1,112 +1,94 @@
 #include <catch2/catch.hpp>
-#include "ProcessorConfiguration.h"
+#include "ProcessorParameters.h"
 
-nlohmann::json createReferenceJsonParameterConfiguration()
+constexpr auto integerParameterName{"integer_parameter"};
+constexpr auto decimalParameterName{"decimal_parameter"};
+constexpr auto booleanParameterName{"boolean_parameter"};
+constexpr auto optionsParameterName{"options_parameter"};
+
+constexpr auto integerParameterInitialValue{1};
+constexpr auto decimalParameterInitialValue{1.2};
+constexpr auto booleanParameterInitialValue{true};
+constexpr std::size_t optionIndexParameterInitialValue{0};
+
+constexpr auto integerParameterConfigureValue{2};
+constexpr auto decimalParameterConfigureValue{2.0};
+constexpr auto booleanParameterConfigureValue{false};
+constexpr std::size_t optionIndexParameterConfigureValue{1};
+
+Configuration createDummyConfiguration()
 {
-    return nlohmann::json{
-            {
-                    {
-                            {"name", "int_parameter"},
-                            {"type", "integer"},
-                            {"value", 1},
-                            {"min_value", 0},
-                            {"max_value", 10}
-                    },
-                    {
-                            {"name", "float_parameter"},
-                            {"type", "float"},
-                            {"value", 1.100000023841858},
-                            {"min_value", 0.10000000149011612},
-                            {"max_value", 10.899999618530273},
-                            {"step", 0.20000000298023224},
-                            {"decimals", 2}
-                    },
-                    {
-                            {"name", "boolean_parameter"},
-                            {"type", "boolean"},
-                            {"value", true}
-                    },
-                    {
-                            {"name", "options_parameter"},
-                            {"type", "options"},
-                            {"value", 0},
-                            {"options", {"option1", "option2"}}
-                    }
-            }
-    };
+    Configuration configuration;
+    configuration[integerParameterName] = integerParameterConfigureValue;
+    configuration[decimalParameterName] = decimalParameterConfigureValue;
+    configuration[booleanParameterName] = booleanParameterConfigureValue;
+    configuration[optionsParameterName] = optionIndexParameterConfigureValue;
+    return configuration;
 }
 
-nlohmann::json createConfiguration2()
+SCENARIO("Parameters can be registered and configured")
 {
-    return nlohmann::json{
-            {
-                    {"name", "int_parameter"},
-                    {"value", 2}
-            },
-            {
-                    {"name", "float_parameter"},
-                    {"value", 1.5}
-            },
-            {
-                    {"name", "boolean_parameter"},
-                    {"value", false}
-            },
-            {
-                    {"name", "options_parameter"},
-                    {"value", 1},
-            }
-    };
-}
+    GIVEN("A parameters element")
+    {
+        ProcessorParameters parameters;
 
-nlohmann::json createReferenceJsonParameterConfiguration2()
-{
-    return nlohmann::json{
+        WHEN("Parameters are registered")
+        {
 
+            parameters.registerParameter(integerParameterName,
+                                         IntegerParameter{integerParameterInitialValue, 0, 10});
+            parameters.registerParameter(decimalParameterName,
+                                         DecimalParameter{decimalParameterInitialValue, 0.1,10.9, 0.2, 2});
+            parameters.registerParameter(booleanParameterName, booleanParameterInitialValue);
+            parameters.registerParameter(optionsParameterName,
+                                         OptionsParameter{optionIndexParameterInitialValue, {"option1", "option2"}});
+
+            THEN("Parameter values can be obtained")
             {
-                    {"name", "int_parameter"},
-                    {"type", "integer"},
-                    {"value", 2},
-                    {"min_value", 0},
-                    {"max_value", 10}
-            },
-            {
-                    {"name", "float_parameter"},
-                    {"type", "float"},
-                    {"value", 1.5},
-                    {"min_value", 0.10000000149011612},
-                    {"max_value", 10.899999618530273},
-                    {"step", 0.20000000298023224},
-                    {"decimals", 2}
-            },
-            {
-                    {"name", "boolean_parameter"},
-                    {"type", "boolean"},
-                    {"value", false}
-            },
-            {
-                    {"name", "options_parameter"},
-                    {"type", "options"},
-                    {"value", 1},
-                    {"options", {"option1", "option2"}}
+                CHECK(parameters.getParameterValue<int>(integerParameterName) == integerParameterInitialValue);
+                CHECK(parameters.getParameterValue<double>(decimalParameterName) == decimalParameterInitialValue);
+                CHECK(parameters.getParameterValue<bool>(booleanParameterName) == booleanParameterInitialValue);
+                CHECK(parameters.getParameterValue<std::size_t>(optionsParameterName) == optionIndexParameterInitialValue);
             }
 
-    };
-}
+            AND_WHEN("Parameters are configured")
+            {
+                parameters.configure(createDummyConfiguration());
 
-TEST_CASE("Configuration parameters can be created and modified")
-{
-    ProcessorConfiguration configuration;
+                THEN("New parameter values can be obtained")
+                {
+                    CHECK(parameters.getParameterValue<int>(integerParameterName) == integerParameterConfigureValue);
+                    CHECK(parameters.getParameterValue<double>(decimalParameterName) == decimalParameterConfigureValue);
+                    CHECK(parameters.getParameterValue<bool>(booleanParameterName) == booleanParameterConfigureValue);
+                    CHECK(parameters.getParameterValue<size_t>(optionsParameterName) == optionIndexParameterConfigureValue);
+                }
+            }
 
-    configuration.addIntParameter("int_parameter", 1, 0, 10);
-    configuration.addFloatParameter("float_parameter", 1.1, 0.1, 10.9, 0.2, 2);
-    configuration.addBooleanParameter("boolean_parameter", true);
-    configuration.addOptionsParameter("options_parameter", {"option1", "option2"}, 0);
+            AND_WHEN("Non existing parameters are configured")
+            {
+                Configuration wrongConfiguration{{"non_existing_parameter_1", 1},
+                                                 {"non_existing_parameter_2", 2}};
+                THEN("Throws")
+                {
+                    CHECK_THROWS_WITH(parameters.configure(wrongConfiguration),
+                                      Catch::Contains("Parameters not found: ") &&
+                                      Catch::Contains("non_existing_parameter_1") &&
+                                      Catch::Contains("non_existing_parameter_2"));
+                }
+            }
 
-    auto jsonConfiguration{configuration.getConfiguration()};
+            AND_WHEN("Non wrong parameter types are configured")
+            {
+                Configuration wrongConfiguration = {{integerParameterName, 3.7}, {booleanParameterName, 1}};
 
-    REQUIRE(jsonConfiguration == createReferenceJsonParameterConfiguration());
-
-    configuration.configure(createConfiguration2());
-    jsonConfiguration = configuration.getConfiguration();
-    REQUIRE(jsonConfiguration == createReferenceJsonParameterConfiguration2());
+                THEN("Throws")
+                {
+                    CHECK_THROWS_WITH(parameters.configure(wrongConfiguration),
+                                      Catch::Contains("Couldn't configure image processor. Wrong type in parameters: ") &&
+                                      Catch::Contains(integerParameterName) &&
+                                      Catch::Contains(booleanParameterName));
+                }
+            }
+        }
+    }
 }

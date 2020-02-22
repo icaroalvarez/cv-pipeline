@@ -7,7 +7,7 @@
 #include <opencv2/core/mat.hpp>
 
 /**
- * Responsability: allows to control the pipeline from the outside (a GUI for example).
+ * Responsibility: allows to control the pipeline from the outside (a GUI for example).
  * Image processors can be registered and loaded into the pipeline
  * An image can be loaded and processed through the image processors loaded into the pipeline.
  * The image processors loaded into the pipeline can be configured.
@@ -40,14 +40,14 @@ public:
      * @param index the index of the processor in the pipeline
      * @param configuration the parameters to be configured in json format
      */
-    void configureProcessor(unsigned int index, const nlohmann::json& configuration);
+    void configureProcessor(unsigned int index, const Configuration& configuration);
 
     /**
      * Get the parameters of an image processor
      * @param processorIndex index of the processor to get the parameters
      * @return the configuration parameters of the image processor
      */
-    nlohmann::json getProcessorConfigurationFrom(unsigned int processorIndex) const;
+    Parameters getProcessorConfigurationFrom(unsigned int processorIndex) const;
 
     /**
      * Start the loaded image processing through the pipeline

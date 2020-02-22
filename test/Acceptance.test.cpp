@@ -20,7 +20,7 @@ public:
     MockProcessor2()
             :ImageProcessor("mock_processor_2")
     {
-        getConfiguration().addIntParameter("parameter_1", 1, 0, 100);
+        getConfiguration().registerParameter("parameter_1", IntegerParameter{1, 0, 100});
     }
     MAKE_MOCK1(processImage, void(const cv::Mat&), override);
 };
@@ -46,11 +46,9 @@ SCENARIO("An image processor pipeline can be loaded")
 
             THEN("Successfully loads a pipeline with previously registered image processors")
             {
-                const std::vector<std::string> pipeline{"mock_processor_1", "mock_processor_2"};
-                CHECK_NOTHROW(controller.loadPipeline(pipeline));
-
-                const auto loadedPipelineDescription = controller.getPipelineDescription();
-                CHECK(loadedPipelineDescription == pipeline);
+                const std::vector<std::string> pipelineDescription{"mock_processor_1", "mock_processor_2"};
+                CHECK_NOTHROW(controller.loadPipeline(pipelineDescription));
+                CHECK(controller.getPipelineDescription() == pipelineDescription);
             }
         }
     }
@@ -98,9 +96,8 @@ SCENARIO("A pipeline's image processor can be configured")
         THEN("It fails if incorrect image processor index is configured")
         {
             constexpr auto imageProcessorIndex{3};
-            std::unordered_map<std::string, int> configuration;
             const auto exceptionMessage{std::string{"Couldn't configure the image processor. The index 3 is out of range (2)"}};
-            CHECK_THROWS_WITH(controller->configureProcessor(imageProcessorIndex, configuration), exceptionMessage);
+            CHECK_THROWS_WITH(controller->configureProcessor(imageProcessorIndex, {}), exceptionMessage);
         }
 
         THEN("It fails if the Image processor is configured with incorrect parameters")
@@ -108,10 +105,7 @@ SCENARIO("A pipeline's image processor can be configured")
             constexpr auto imageProcessorIndex{1};
             constexpr auto parameterName{"non_existing_parameter"};
             constexpr auto parameterName2{"non_existing_parameter_2"};
-            nlohmann::json configuration{
-                    {{"name", parameterName},{"value", 1}},
-                    {{"name", parameterName2},{"value", 2}},
-            };
+            Configuration configuration{{parameterName, 1}, {parameterName2, 2}};
             const auto exceptionMessage{std::string{"Couldn't configure image processor. Parameters not found: "}
                                         +parameterName+", "+parameterName2};
             CHECK_THROWS_WITH(controller->configureProcessor(imageProcessorIndex, configuration),
@@ -123,9 +117,7 @@ SCENARIO("A pipeline's image processor can be configured")
         {
             constexpr auto imageProcessorIndex{1};
             constexpr auto parameterName{"parameter_1"};
-            nlohmann::json configuration{
-                    {{"name", parameterName},{"value", 1}},
-            };
+            Configuration configuration{{parameterName, 1}};
             CHECK_NOTHROW(controller->configureProcessor(imageProcessorIndex, configuration));
         }
     }

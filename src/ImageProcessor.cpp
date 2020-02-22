@@ -5,7 +5,7 @@ ImageProcessor::ImageProcessor(std::string name)
 {
 }
 
-ProcessorConfiguration& ImageProcessor::getConfiguration()
+ProcessorParameters& ImageProcessor::getConfiguration()
 {
     return configuration;
 }

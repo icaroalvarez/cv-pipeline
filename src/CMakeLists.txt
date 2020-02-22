@@ -6,7 +6,7 @@ set(source_files
         Factory
         Observer
         Notifier
-        ProcessorConfiguration
+        ProcessorParameters
         Runnable)
 
 add_library(panoramix

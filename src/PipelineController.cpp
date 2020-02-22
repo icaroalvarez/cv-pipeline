@@ -55,7 +55,7 @@ void checkImageProcessorRange(const std::vector<std::unique_ptr<ImageProcessor>>
 }
 
 void PipelineController::configureProcessor(unsigned int index,
-                                            const nlohmann::json& configuration)
+                                            const Configuration& configuration)
 {
     checkImageProcessorRange(imageProcessors, index, "Couldn't configure the image processor. ");
     imageProcessors[index]->getConfiguration().configure(configuration);
@@ -88,9 +88,9 @@ cv::Mat PipelineController::getDebugImage(unsigned int processorIndex)
     return imageProcessors[processorIndex]->getDebugImage();
 }
 
-nlohmann::json PipelineController::getProcessorConfigurationFrom(unsigned int processorIndex) const {
+Parameters PipelineController::getProcessorConfigurationFrom(unsigned int processorIndex) const {
     checkImageProcessorRange(imageProcessors, processorIndex, "Couldn't get image processor configuration. ");
-    return imageProcessors[processorIndex]->getConfiguration().getConfiguration();
+    return imageProcessors[processorIndex]->getConfiguration().getParameters();
 }
 
 void PipelineController::runIteration()

@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <any>
 #include <opencv2/core/mat.hpp>
-#include "ProcessorConfiguration.h"
+#include "ProcessorParameters.h"
 
 /**
  * Responsibility: process an image.
@@ -19,7 +19,7 @@ public:
      * Get the current processor configuration
      * @return the configuration
      */
-    ProcessorConfiguration& getConfiguration();
+    ProcessorParameters& getConfiguration();
 
     /**
      * Implement this method when creating new image processors
@@ -59,6 +59,6 @@ public:
 
 private:
     std::string name;
-    ProcessorConfiguration configuration;
+    ProcessorParameters configuration;
     cv::Mat postProcessedImage, debugImage;
 };

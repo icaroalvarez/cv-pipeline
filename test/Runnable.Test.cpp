@@ -9,13 +9,13 @@ class MockRunnable: public Runnable
     MAKE_MOCK0(runIteration, void(), override);
 };
 
-TEST_CASE("can be created and destroyed and no iteration is executed")
+TEST_CASE("Can be created and destroyed and no iteration is executed")
 {
     MockRunnable runnable;
     FORBID_CALL(runnable, runIteration());
 }
 
-TEST_CASE("runs a single iteration")
+TEST_CASE("Runs a single iteration")
 {
     std::atomic_bool iterationExecuted(false);
     MockRunnable runnable;
@@ -31,7 +31,7 @@ TEST_CASE("runs a single iteration")
     }
 }
 
-TEST_CASE("discards any other requests while executing one iteration")
+TEST_CASE("Discards any other requests while executing one iteration")
 {
     std::atomic_bool iterationExecuting{false};
     std::atomic_bool iterationExecuted{false};
@@ -61,7 +61,7 @@ TEST_CASE("discards any other requests while executing one iteration")
     }
 }
 
-TEST_CASE("fire more than one iterations")
+TEST_CASE("Fire more than one iterations")
 {
     constexpr auto nIterations{10};
     std::atomic_bool iterationExecuted{false};
