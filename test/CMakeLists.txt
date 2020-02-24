@@ -5,7 +5,8 @@ set(test_source_files
         Acceptance.test.cpp
         Factory.test.cpp
         ProcessorConfiguration.Test.cpp
-        Runnable.Test.cpp)
+        Runnable.Test.cpp
+        ImageFrameSource.Test.cpp)
 
 add_executable(test_panoramix
         ${test_source_files}

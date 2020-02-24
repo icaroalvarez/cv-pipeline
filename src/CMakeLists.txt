@@ -7,7 +7,8 @@ set(source_files
         Observer
         Notifier
         ProcessorParameters
-        Runnable)
+        Runnable
+        ImageFrameSource)
 
 add_library(panoramix
         ${source_files}
