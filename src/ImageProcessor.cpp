@@ -10,16 +10,6 @@ ProcessorParameters& ImageProcessor::getConfiguration()
     return configuration;
 }
 
-cv::Mat ImageProcessor::getPostProcessedImage() const
-{
-    return postProcessedImage;
-}
-
-void ImageProcessor::setPostProcessedImage(cv::Mat image)
-{
-    postProcessedImage = std::move(image);
-}
-
 cv::Mat ImageProcessor::getDebugImage() const {
     return debugImage;
 }

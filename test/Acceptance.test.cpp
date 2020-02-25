@@ -129,22 +129,26 @@ public:
     MAKE_MOCK0(update, void(), override);
 };
 
-SCENARIO("An image from frame source can be processed through the pipeline")
+SCENARIO("Process an image through the pipeline")
 {
-    GIVEN("A pipeline and a frame source are already loaded")
+    GIVEN("A pipeline with two image processors and a frame source loaded")
     {
         auto controller{std::make_unique<PipelineController>()};
         auto imageProcessor1{std::make_unique<MockProcessor1>()};
+        cv::Mat dummyImage1{cv::Mat::ones({10,10}, CV_8U)};
         REQUIRE_CALL(*imageProcessor1, processImage(trompeloeil::_));
+
         auto imageProcessor2{std::make_unique<MockProcessor1>()};
+        cv::Mat dummyImage2{2 * cv::Mat::ones({10,10}, CV_8U)};
         REQUIRE_CALL(*imageProcessor2, processImage(trompeloeil::_));
+
         controller->addImageProcessor(std::move(imageProcessor1));
         controller->addImageProcessor(std::move(imageProcessor2));
 
         constexpr auto frameSourcePath{fixtures_path"Lenna.png"};
-        controller->loadFrameSourceFrom(frameSourcePath);
+        REQUIRE_NOTHROW(controller->loadFrameSourceFrom(frameSourcePath));
 
-        WHEN("An observer is registered and an image is fired to be processed")
+        WHEN("An observer is registered")
         {
             auto mockObserver{std::make_shared<MockObserver>()};
             std::atomic_bool observerUpdated{false};
@@ -152,21 +156,17 @@ SCENARIO("An image from frame source can be processed through the pipeline")
             .LR_SIDE_EFFECT(observerUpdated = true);
 
             controller->registerObserver(mockObserver.get());
-            controller->firePipelineProcessing();
 
-            THEN("The observer is notified when the image is processed by all image processors")
+            AND_WHEN("Pipeline processing is fired")
             {
-                while(!observerUpdated)
-                {
-                    std::this_thread::sleep_for(std::chrono::microseconds(100));
-                }
+                controller->firePipelineProcessing();
 
-                AND_THEN("The original, pre-processed, post-processed and debug images can be retrieved from an image processor")
+                THEN("The observer is notified after the image is processed by all image processors")
                 {
-                    const auto originalImage{controller->getCurrentLoadedImage()};
-                    constexpr auto processorIndex{1};
-                    const auto postProcessedImage{controller->getPostProcessedImage(processorIndex)};
-                    const auto debugImage{controller->getDebugImage(processorIndex)};
+                    while (!observerUpdated)
+                    {
+                        std::this_thread::sleep_for(std::chrono::microseconds(100));
+                    }
                 }
             }
         }

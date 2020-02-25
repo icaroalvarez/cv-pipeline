@@ -28,18 +28,6 @@ public:
     virtual void processImage(const cv::Mat &image) = 0;
 
     /**
-     * Get the image generated after processing the image
-     * @return the image processed
-     */
-    cv::Mat getPostProcessedImage() const;
-
-    /**
-     * Set the image generated after processing the image
-     * @param image the image processed
-     */
-    void setPostProcessedImage(cv::Mat image);
-
-    /**
      * Get the debug image generated while processing the image
      * @return the image processed
      */

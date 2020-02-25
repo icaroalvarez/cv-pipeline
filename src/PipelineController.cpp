@@ -74,12 +74,6 @@ cv::Mat PipelineController::getCurrentLoadedImage()
     return currentImage;
 }
 
-cv::Mat PipelineController::getPostProcessedImage(unsigned int processorIndex)
-{
-    checkImageProcessorRange(imageProcessors, processorIndex, "Couldn't get post processed image. ");
-    return imageProcessors[processorIndex]->getPostProcessedImage();
-}
-
 cv::Mat PipelineController::getDebugImage(unsigned int processorIndex)
 {
     checkImageProcessorRange(imageProcessors, processorIndex, "Couldn't debug image. ");
@@ -98,7 +92,6 @@ void PipelineController::runIteration()
     for(const auto& processor: imageProcessors)
     {
         processor->processImage(imageFromPreviousProcessor);
-        imageFromPreviousProcessor = processor->getPostProcessedImage();
     }
     notifyObservers();
 }
