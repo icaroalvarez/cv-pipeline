@@ -63,14 +63,14 @@ SCENARIO("A frame source can be loaded")
         THEN("Fails loading a non existing frame source")
         {
             const auto path{"non_existing_path"};
-            const auto exceptionMessage{std::string("Couldn't load frame source. Non path found: ")+path};
-            CHECK_THROWS_WITH(controller.loadImage(path), exceptionMessage);
+            const auto exceptionMessage{std::string("Unable to load image from: ")+path};
+            CHECK_THROWS_WITH(controller.loadFrameSourceFrom(path), exceptionMessage);
         }
 
         THEN("Load successfully a existing frame source")
         {
             constexpr auto path{fixtures_path"Lenna.png"};
-            CHECK_NOTHROW(controller.loadImage(path));
+            CHECK_NOTHROW(controller.loadFrameSourceFrom(path));
         }
     }
 }
@@ -84,7 +84,7 @@ std::unique_ptr<PipelineController> createPipelineController()
     controller->loadPipeline(pipeline);
 
     constexpr auto frameSourcePath{fixtures_path"Lenna.png"};
-    controller->loadImage(frameSourcePath);
+    controller->loadFrameSourceFrom(frameSourcePath);
     return std::move(controller);
 }
 
@@ -142,7 +142,7 @@ SCENARIO("An image from frame source can be processed through the pipeline")
         controller->addImageProcessor(std::move(imageProcessor2));
 
         constexpr auto frameSourcePath{fixtures_path"Lenna.png"};
-        controller->loadImage(frameSourcePath);
+        controller->loadFrameSourceFrom(frameSourcePath);
 
         WHEN("An observer is registered and an image is fired to be processed")
         {
@@ -152,7 +152,7 @@ SCENARIO("An image from frame source can be processed through the pipeline")
             .LR_SIDE_EFFECT(observerUpdated = true);
 
             controller->registerObserver(mockObserver.get());
-            controller->processCurrentImage();
+            controller->firePipelineProcessing();
 
             THEN("The observer is notified when the image is processed by all image processors")
             {

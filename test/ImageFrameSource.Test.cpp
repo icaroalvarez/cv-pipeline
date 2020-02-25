@@ -15,6 +15,7 @@ TEST_CASE("Loads the frame source")
 
     CHECK(frameSource.framesCount() == 1);
     cv::Mat lennaImage{cv::imread(fixtures_path"Lenna.png")};
+
     auto frame{frameSource.getFrameFromIndex(0)};
     CHECK(std::equal(lennaImage.begin<uchar>(), lennaImage.end<uchar>(), frame.begin<uchar>()));
 }

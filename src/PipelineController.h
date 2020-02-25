@@ -3,6 +3,7 @@
 #include "Factory.h"
 #include "Notifier.h"
 #include "Runnable.h"
+#include "ImageFrameSource.h"
 #include <any>
 #include <opencv2/core/mat.hpp>
 
@@ -33,7 +34,9 @@ public:
      * Load the image to be processed through the pipeline
      * @param path of the image
      */
-    void loadImage(const std::string& path);
+    void loadFrameSourceFrom(const std::string& path);
+
+    void setFrameSourceIndex(unsigned int index);
 
     /**
      * Configure the parameters of an image processor
@@ -52,7 +55,7 @@ public:
     /**
      * Start the loaded image processing through the pipeline
      */
-    void processCurrentImage();
+    void firePipelineProcessing();
 
     /**
      * Add an image processor to the back of the pipeline
@@ -95,6 +98,8 @@ private:
     std::vector<std::unique_ptr<ImageProcessor>> imageProcessors;
     Factory<ImageProcessor> imageProcessorFactory;
     cv::Mat currentImage;
+    std::unique_ptr<ImageFrameSource> frameSource;
+    unsigned int frameSourceIndex;
 
     void runIteration() override;
 };

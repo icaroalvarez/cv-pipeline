@@ -33,18 +33,16 @@ std::vector<std::string> PipelineController::getPipelineDescription() const
     return processorNames;
 }
 
-void PipelineController::loadImage(const std::string &path)
+void PipelineController::loadFrameSourceFrom(const std::string &path)
 {
-    currentImage = cv::imread(path);
-    if(!currentImage.data)
-    {
-        throw std::invalid_argument("Couldn't load frame source. Non path found: "+path);
-    }
+    frameSource = std::make_unique<ImageFrameSource>();
+    frameSource->loadFrom(path);
+    frameSourceIndex = 0;
 }
 
 void checkImageProcessorRange(const std::vector<std::unique_ptr<ImageProcessor>>& imageProcessors,
                               unsigned int index,
-            const std::string& exceptionMessage)
+                              const std::string& exceptionMessage)
 {
     if(index >= imageProcessors.size())
     {
@@ -61,7 +59,7 @@ void PipelineController::configureProcessor(unsigned int index,
     imageProcessors[index]->getConfiguration().configure(configuration);
 }
 
-void PipelineController::processCurrentImage()
+void PipelineController::firePipelineProcessing()
 {
     fireIteration();
 }
@@ -95,6 +93,7 @@ Parameters PipelineController::getProcessorConfigurationFrom(unsigned int proces
 
 void PipelineController::runIteration()
 {
+    currentImage = frameSource->getFrameFromIndex(frameSourceIndex);
     cv::Mat imageFromPreviousProcessor{currentImage};
     for(const auto& processor: imageProcessors)
     {
@@ -102,4 +101,15 @@ void PipelineController::runIteration()
         imageFromPreviousProcessor = processor->getPostProcessedImage();
     }
     notifyObservers();
+}
+
+void PipelineController::setFrameSourceIndex(unsigned index)
+{
+    const auto framesCount{frameSource->framesCount()};
+    if(index >= framesCount)
+    {
+        throw std::invalid_argument("Frame source index out of bound (requested: "+
+                                    std::to_string(index)+" max: "+std::to_string(framesCount));
+    }
+    frameSourceIndex = index;
 }
