@@ -6,7 +6,8 @@ set(test_source_files
         Factory.test.cpp
         ProcessorConfiguration.Test.cpp
         Runnable.Test.cpp
-        ImageFrameSource.Test.cpp)
+        ImageFrameSource.Test.cpp
+        )
 
 add_executable(test_panoramix
         ${test_source_files}
@@ -24,3 +25,12 @@ target_include_directories(test_panoramix PRIVATE
 target_compile_definitions(test_panoramix
         PRIVATE fixtures_path="${CMAKE_CURRENT_SOURCE_DIR}/fixtures/"
         )
+
+include(CMakeModules/CodeCoverage.cmake)
+append_coverage_compiler_flags()
+target_compile_options(panoramix PRIVATE -g -fprofile-arcs -ftest-coverage)
+setup_target_for_coverage_gcovr_html(
+        NAME test_panoramix_coverage
+        EXECUTABLE test_panoramix
+        DEPENDENCIES panoramix
+        EXCLUDE "${PROJECT_SOURCE_DIR}/test/*")
