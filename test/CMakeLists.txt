@@ -29,8 +29,9 @@ target_compile_definitions(test_panoramix
 include(CMakeModules/CodeCoverage.cmake)
 append_coverage_compiler_flags()
 target_compile_options(panoramix PRIVATE -g -fprofile-arcs -ftest-coverage)
-setup_target_for_coverage_gcovr_html(
+setup_target_for_coverage_lcov(
         NAME test_panoramix_coverage
         EXECUTABLE test_panoramix
         DEPENDENCIES panoramix
-        EXCLUDE "${PROJECT_SOURCE_DIR}/test/*")
+        BASE_DIRECTORY "${PROJECT_SOURCE_DIR}/src"
+        EXCLUDE "${PROJECT_SOURCE_DIR}/test/*" "/usr/*" "$ENV{HOME}/.conan/*")
