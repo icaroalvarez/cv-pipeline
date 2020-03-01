@@ -29,8 +29,8 @@ struct DecimalParameter{
         return value == rightHandSide.value &&
                minValue == rightHandSide.minValue &&
                maxValue == rightHandSide.maxValue &&
-               incrementalStep && rightHandSide.incrementalStep &&
-               decimalsPlaces && rightHandSide.decimalsPlaces;
+               incrementalStep == rightHandSide.incrementalStep &&
+               decimalsPlaces == rightHandSide.decimalsPlaces;
     }
 };
 

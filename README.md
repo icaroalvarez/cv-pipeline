@@ -1,27 +1,19 @@
-# Panoramix - Visual playground for your image processors.
+# Panoramix - Test playground for your image processors.
 
-Tool for graphically testing computer vision image processors.
-
-![Class diagram](./doc/screenshot.png)
+Library tool for testing computer vision image processors. 
 
 ## Installing external dependencies
 
 ### Dependencies managed by conan
 - Catch2
 - Trompeloeil
-- Json
+- OpenCV
 
-Run the following commands for install the dependencies:
+Run the following script for installing the dependencies:
 
 ```bash
-mkdir build && cd build
-conan install ..
+sh conan_install.sh
 ```
-
-### Other dependencies
-Install this dependencies manually in the system: 
-- OpenCV 3
-- Qt5
 
 ## Building the project
 

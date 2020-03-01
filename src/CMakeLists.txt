@@ -15,7 +15,7 @@ add_library(panoramix
         )
 
 target_link_libraries(panoramix
-        CONAN_PKG::jsonformoderncpp
         pthread
         opencv_core
-        opencv_highgui)
+        opencv_imgcodecs
+        )

@@ -6,9 +6,6 @@ message("CMake build type: " ${CMAKE_BUILD_TYPE})
 
 include(.conan/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)
-message(${CONAN_INCLUDE_DIRS})
-
-find_package(OpenCV REQUIRED COMPONENTS core highgui)
 find_package(Threads)
 
 add_subdirectory(src)
