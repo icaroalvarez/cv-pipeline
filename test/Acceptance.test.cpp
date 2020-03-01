@@ -15,13 +15,16 @@ public:
     MAKE_MOCK1(processImage, cv::Mat(const cv::Mat&), override);
 };
 
+constexpr auto parameter1Name{"parameter_1"};
+constexpr auto integerParameter{IntegerParameter{1, 0, 100}};
+
 class MockProcessor2: public ImageProcessor
 {
 public:
     MockProcessor2()
             :ImageProcessor("mock_processor_2")
     {
-        getConfiguration().registerParameter("parameter_1", IntegerParameter{1, 0, 100});
+        getConfiguration().registerParameter(parameter1Name, integerParameter);
     }
     MAKE_MOCK1(processImage, cv::Mat(const cv::Mat&), override);
 };
@@ -55,11 +58,17 @@ SCENARIO("An image processor pipeline can be loaded")
     }
 }
 
-SCENARIO("A frame source can be loaded")
+SCENARIO("A frame source can be loaded", "[acceptance]")
 {
     GIVEN("A pipeline controller")
     {
         PipelineController controller;
+
+        THEN("Throw if frame source index is set before been loaded")
+        {
+            CHECK_THROWS_WITH(controller.setFrameSourceIndex(1),
+                    "Frame source is not loaded yet, index cannot be set");
+        }
 
         THEN("Fails loading a non existing frame source")
         {
@@ -72,6 +81,17 @@ SCENARIO("A frame source can be loaded")
         {
             constexpr auto path{fixtures_path"Lenna.png"};
             CHECK_NOTHROW(controller.loadFrameSourceFrom(path));
+
+            AND_THEN("Fails setting incorrect frame source index")
+            {
+                CHECK_THROWS_WITH(controller.setFrameSourceIndex(1),
+                                  "Frame source index out of bound (requested: 1, max: 0)");
+            }
+
+            AND_THEN("Set frame index if is not out of bound")
+            {
+                CHECK_NOTHROW(controller.setFrameSourceIndex(0));
+            }
         }
     }
 }
@@ -114,12 +134,18 @@ SCENARIO("A pipeline's image processor can be configured")
                               && Catch::Contains(parameterName) && Catch::Contains(parameterName2));
         }
 
-        THEN("Doesn't fail if the Image processor is configured with correct parameters")
+        THEN("Configure Image processor if parameters are correct")
         {
-            constexpr auto imageProcessorIndex{1};
-            constexpr auto parameterName{"parameter_1"};
-            Configuration configuration{{parameterName, 1}};
-            CHECK_NOTHROW(controller->configureProcessor(imageProcessorIndex, configuration));
+            constexpr auto imageProcessor2Index{1};
+            constexpr auto parameter1NewValue{2};
+            Configuration configuration{{parameter1Name, parameter1NewValue}};
+            CHECK_NOTHROW(controller->configureProcessor(imageProcessor2Index, configuration));
+
+            auto newIntegerParameter{integerParameter};
+            newIntegerParameter.value = parameter1NewValue;
+            Parameters expectedParameters{{parameter1Name, newIntegerParameter}};
+            const auto parameters{controller->getProcessorParameters(imageProcessor2Index)};
+            REQUIRE(parameters == expectedParameters);
         }
     }
 }
@@ -196,7 +222,14 @@ SCENARIO("Process an image through the pipeline")
                         std::this_thread::sleep_for(std::chrono::microseconds(100));
                     }
 
-                    AND_THEN("The debug image can be retrieved")
+                    AND_THEN("Pipeline input image can be retrieved")
+                    {
+                        const auto inputImage{controller->getCurrentLoadedImage()};
+                        REQUIRE(std::equal(inputImage.begin<uchar>(), inputImage.end<uchar>(),
+                                           lennaImage.begin<uchar>()));
+                    }
+
+                    AND_THEN("The image processors debug image can be retrieved")
                     {
                         constexpr auto processor1Index{0};
                         const auto debugImageProcessor1{controller->getDebugImage(processor1Index)};

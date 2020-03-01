@@ -80,7 +80,7 @@ cv::Mat PipelineController::getDebugImage(unsigned int processorIndex)
     return imageProcessors[processorIndex]->getDebugImage();
 }
 
-Parameters PipelineController::getProcessorConfigurationFrom(unsigned int processorIndex) const {
+Parameters PipelineController::getProcessorParameters(unsigned int processorIndex) const {
     checkImageProcessorRange(imageProcessors, processorIndex, "Couldn't get image processor configuration. ");
     return imageProcessors[processorIndex]->getConfiguration().getParameters();
 }
@@ -98,11 +98,15 @@ void PipelineController::runIteration()
 
 void PipelineController::setFrameSourceIndex(unsigned index)
 {
+    if(not frameSource)
+    {
+        throw std::runtime_error("Frame source is not loaded yet, index cannot be set");
+    }
     const auto framesCount{frameSource->framesCount()};
     if(index >= framesCount)
     {
         throw std::invalid_argument("Frame source index out of bound (requested: "+
-                                    std::to_string(index)+" max: "+std::to_string(framesCount));
+                                    std::to_string(index)+", max: "+std::to_string(framesCount-1)+")");
     }
     frameSourceIndex = index;
 }

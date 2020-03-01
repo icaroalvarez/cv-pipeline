@@ -8,6 +8,13 @@ struct IntegerParameter{
     int value;
     int minValue;
     int maxValue;
+
+    bool operator==(const IntegerParameter& rightHandSide) const
+    {
+        return value == rightHandSide.value &&
+               minValue == rightHandSide.minValue &&
+               maxValue == rightHandSide.maxValue;
+    }
 };
 
 struct DecimalParameter{
@@ -16,12 +23,27 @@ struct DecimalParameter{
     double maxValue;
     double incrementalStep;
     unsigned int decimalsPlaces;
+
+    bool operator==(const DecimalParameter& rightHandSide) const
+    {
+        return value == rightHandSide.value &&
+               minValue == rightHandSide.minValue &&
+               maxValue == rightHandSide.maxValue &&
+               incrementalStep && rightHandSide.incrementalStep &&
+               decimalsPlaces && rightHandSide.decimalsPlaces;
+    }
 };
 
 struct OptionsParameter
 {
     std::size_t selectedOptionIndex;
     std::vector<std::string> options;
+
+    bool operator==(const OptionsParameter& rightHandSide) const
+    {
+        return selectedOptionIndex == rightHandSide.selectedOptionIndex &&
+                options == rightHandSide.options;
+    }
 };
 
 using Configuration = std::unordered_map<std::string, std::variant<int, double, bool, std::size_t>>;

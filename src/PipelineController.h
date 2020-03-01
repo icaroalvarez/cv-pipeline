@@ -50,7 +50,7 @@ public:
      * @param processorIndex index of the processor to get the parameters
      * @return the configuration parameters of the image processor
      */
-    Parameters getProcessorConfigurationFrom(unsigned int processorIndex) const;
+    Parameters getProcessorParameters(unsigned int processorIndex) const;
 
     /**
      * Start the loaded image processing through the pipeline
