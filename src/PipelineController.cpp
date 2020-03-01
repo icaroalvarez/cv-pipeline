@@ -91,7 +91,7 @@ void PipelineController::runIteration()
     cv::Mat imageFromPreviousProcessor{currentImage};
     for(const auto& processor: imageProcessors)
     {
-        processor->processImage(imageFromPreviousProcessor);
+        imageFromPreviousProcessor = processor->processImage(imageFromPreviousProcessor);
     }
     notifyObservers();
 }

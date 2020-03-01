@@ -13,7 +13,7 @@
 class ImageProcessor
 {
 public:
-    ImageProcessor(std::string name);
+    explicit ImageProcessor(std::string name);
 
     /**
      * Get the current processor configuration
@@ -25,7 +25,7 @@ public:
      * Implement this method when creating new image processors
      * @param image the input image to be processed
      */
-    virtual void processImage(const cv::Mat &image) = 0;
+    virtual cv::Mat processImage(const cv::Mat &image) = 0;
 
     /**
      * Get the debug image generated while processing the image
@@ -48,5 +48,5 @@ public:
 private:
     std::string name;
     ProcessorParameters configuration;
-    cv::Mat postProcessedImage, debugImage;
+    cv::Mat debugImage;
 };

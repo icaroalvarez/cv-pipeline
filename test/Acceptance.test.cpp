@@ -1,6 +1,7 @@
 #include <any>
 #include <Observer.h>
 #include <thread>
+#include <opencv2/imgcodecs.hpp>
 #include "trompeloeil.hpp"
 #include "catch2/catch.hpp"
 #include "PipelineController.h"
@@ -11,7 +12,7 @@ public:
     MockProcessor1()
             : ImageProcessor("mock_processor_1"){};
 
-    MAKE_MOCK1(processImage, void(const cv::Mat&), override);
+    MAKE_MOCK1(processImage, cv::Mat(const cv::Mat&), override);
 };
 
 class MockProcessor2: public ImageProcessor
@@ -22,7 +23,7 @@ public:
     {
         getConfiguration().registerParameter("parameter_1", IntegerParameter{1, 0, 100});
     }
-    MAKE_MOCK1(processImage, void(const cv::Mat&), override);
+    MAKE_MOCK1(processImage, cv::Mat(const cv::Mat&), override);
 };
 
 SCENARIO("An image processor pipeline can be loaded")
@@ -129,18 +130,45 @@ public:
     MAKE_MOCK0(update, void(), override);
 };
 
+inline auto image_matcher(const cv::Mat& image)
+{
+    return trompeloeil::make_matcher<cv::Mat>( // matcher of cv::Mat
+
+            // predicate lambda that checks the condition
+            [](const cv::Mat& image, const cv::Mat& referenceImage) {
+                return std::equal(image.begin<uchar>(), image.end<uchar>(), referenceImage.begin<uchar>());
+            },
+
+            // print lambda for error message
+            [](std::ostream& os, const cv::Mat& valid) {
+                os << " matching cv::Mat image";
+            },
+
+            // stored value
+            image
+    );
+}
+
 SCENARIO("Process an image through the pipeline")
 {
     GIVEN("A pipeline with two image processors and a frame source loaded")
     {
+        auto dummyImagesValueIndex{0};
+        cv::Mat lennaImage{cv::imread(fixtures_path"Lenna.png")};
         auto controller{std::make_unique<PipelineController>()};
         auto imageProcessor1{std::make_unique<MockProcessor1>()};
-        cv::Mat dummyImage1{cv::Mat::ones({10,10}, CV_8U)};
-        REQUIRE_CALL(*imageProcessor1, processImage(trompeloeil::_));
+        cv::Mat dummyDebugImageProcessor1{(dummyImagesValueIndex++)*cv::Mat::ones(10, 10, CV_8U)};
+        imageProcessor1->setDebugImage(dummyDebugImageProcessor1);
+        cv::Mat dummyImageProcessor1Output{(dummyImagesValueIndex++)*cv::Mat::ones(10, 10, CV_8U)};
+        REQUIRE_CALL(*imageProcessor1, processImage(image_matcher(lennaImage)))
+        .LR_RETURN(dummyImageProcessor1Output);
 
         auto imageProcessor2{std::make_unique<MockProcessor1>()};
-        cv::Mat dummyImage2{2 * cv::Mat::ones({10,10}, CV_8U)};
-        REQUIRE_CALL(*imageProcessor2, processImage(trompeloeil::_));
+        cv::Mat dummyDebugImageProcessor2{(dummyImagesValueIndex++)*cv::Mat::ones(10, 10, CV_8U)};
+        imageProcessor2->setDebugImage(dummyDebugImageProcessor2);
+        cv::Mat dummyImageProcessor2Output{(dummyImagesValueIndex++)*cv::Mat::ones(10, 10, CV_8U)};
+        REQUIRE_CALL(*imageProcessor2, processImage(image_matcher(dummyImageProcessor1Output)))
+        .LR_RETURN(dummyImageProcessor2Output);
 
         controller->addImageProcessor(std::move(imageProcessor1));
         controller->addImageProcessor(std::move(imageProcessor2));
@@ -166,6 +194,19 @@ SCENARIO("Process an image through the pipeline")
                     while (!observerUpdated)
                     {
                         std::this_thread::sleep_for(std::chrono::microseconds(100));
+                    }
+
+                    AND_THEN("The debug image can be retrieved")
+                    {
+                        constexpr auto processor1Index{0};
+                        const auto debugImageProcessor1{controller->getDebugImage(processor1Index)};
+                        REQUIRE(std::equal(debugImageProcessor1.begin<uchar>(), debugImageProcessor1.end<uchar>(),
+                                dummyDebugImageProcessor1.begin<uchar>()));
+
+                        constexpr auto processor2Index{1};
+                        const auto debugImageProcessor2{controller->getDebugImage(processor2Index)};
+                        REQUIRE(std::equal(debugImageProcessor2.begin<uchar>(), debugImageProcessor2.end<uchar>(),
+                                   dummyDebugImageProcessor2.begin<uchar>()));
                     }
                 }
             }
