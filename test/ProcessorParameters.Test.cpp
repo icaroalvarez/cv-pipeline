@@ -16,6 +16,16 @@ constexpr auto decimalParameterConfigureValue{2.0};
 constexpr auto booleanParameterConfigureValue{false};
 constexpr std::size_t optionIndexParameterConfigureValue{1};
 
+TEST_CASE("Parameters equal operators")
+{
+    IntegerParameter integerParameter{1, 0, 10};
+    CHECK(integerParameter == integerParameter);
+    DecimalParameter decimalParameter{1.0, 0.0, 1.9, 2.0, 2};
+    CHECK(decimalParameter == decimalParameter);
+    OptionsParameter optionsParameter{0, {"option1", "option2"}};
+    CHECK(optionsParameter == optionsParameter);
+}
+
 Configuration createDummyConfiguration()
 {
     Configuration configuration;
@@ -79,14 +89,19 @@ SCENARIO("Parameters can be registered and configured")
 
             AND_WHEN("Non wrong parameter types are configured")
             {
-                Configuration wrongConfiguration = {{integerParameterName, 3.7}, {booleanParameterName, 1}};
+                Configuration wrongConfiguration = {{integerParameterName, 3.7},
+                                                    {booleanParameterName, 1},
+                                                    {optionsParameterName, true},
+                                                    {decimalParameterName, std::size_t(1)}};
 
                 THEN("Throws")
                 {
                     CHECK_THROWS_WITH(parameters.configure(wrongConfiguration),
                                       Catch::Contains("Couldn't configure image processor. Wrong type in parameters: ") &&
                                       Catch::Contains(integerParameterName) &&
-                                      Catch::Contains(booleanParameterName));
+                                      Catch::Contains(booleanParameterName) &&
+                                      Catch::Contains(optionsParameterName) &&
+                                      Catch::Contains(decimalParameterName));
                 }
             }
         }

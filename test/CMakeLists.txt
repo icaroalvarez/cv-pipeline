@@ -4,7 +4,7 @@ set(test_source_files
         main.test.cpp
         Acceptance.test.cpp
         Factory.test.cpp
-        ProcessorConfiguration.Test.cpp
+        ProcessorParameters.Test.cpp
         Runnable.Test.cpp
         ImageFrameSource.Test.cpp
         )
