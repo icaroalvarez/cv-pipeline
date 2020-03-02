@@ -26,12 +26,17 @@ target_compile_definitions(test_panoramix
         PRIVATE fixtures_path="${CMAKE_CURRENT_SOURCE_DIR}/fixtures/"
         )
 
-include(CMakeModules/CodeCoverage.cmake)
-append_coverage_compiler_flags()
-target_compile_options(panoramix PRIVATE -g -fprofile-arcs -ftest-coverage)
-setup_target_for_coverage_lcov(
-        NAME test_panoramix_coverage
-        EXECUTABLE test_panoramix
-        DEPENDENCIES panoramix
-        BASE_DIRECTORY "${PROJECT_SOURCE_DIR}/src"
-        EXCLUDE "${PROJECT_SOURCE_DIR}/test/*" "/usr/*" "$ENV{HOME}/.conan/*")
+option(COVERAGE_ENABLED "Calculate test coverage" OFF)
+
+if(COVERAGE_ENABLED MATCHES ON)
+    message("Testing coverage enabled")
+    include(CMakeModules/CodeCoverage.cmake)
+    append_coverage_compiler_flags()
+    target_compile_options(panoramix PRIVATE -g -fprofile-arcs -ftest-coverage)
+    setup_target_for_coverage_lcov(
+            NAME test_panoramix_coverage
+            EXECUTABLE test_panoramix
+            DEPENDENCIES panoramix
+            BASE_DIRECTORY "${PROJECT_SOURCE_DIR}/src"
+            EXCLUDE "${PROJECT_SOURCE_DIR}/test/*" "/usr/*" "$ENV{HOME}/.conan/*")
+endif()

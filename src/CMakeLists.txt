@@ -19,3 +19,7 @@ target_link_libraries(panoramix
         opencv_core
         opencv_imgcodecs
         )
+
+target_include_directories(panoramix PUBLIC
+        ../src
+)
