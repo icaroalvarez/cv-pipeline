@@ -48,7 +48,7 @@ public:
     /**
      * Get the parameters of an image processor
      * @param processorIndex index of the processor to get the parameters
-     * @return the configuration parameters of the image processor
+     * @return the parameters parameters of the image processor
      */
     Parameters getProcessorParameters(unsigned int processorIndex) const;
 

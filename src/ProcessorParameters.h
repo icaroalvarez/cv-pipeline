@@ -34,9 +34,10 @@ struct DecimalParameter{
     }
 };
 
+using SelectedOptionIndex = std::size_t;
 struct OptionsParameter
 {
-    std::size_t selectedOptionIndex;
+    SelectedOptionIndex selectedOptionIndex;
     std::vector<std::string> options;
 
     bool operator==(const OptionsParameter& rightHandSide) const
@@ -51,10 +52,10 @@ using Parameters = std::unordered_map<std::string, std::variant<IntegerParameter
         DecimalParameter, bool, OptionsParameter>>;
 
 /**
- * Responsibility: to manage the configuration of an image processor.
+ * Responsibility: to manage the parameters of an image processor.
  * Parameters can be added by type: int, float, boolean and options.
  * Parameters can be configured using json format.
- * Current configuration in json format can be retrieve.
+ * Current parameters in json format can be retrieve.
  */
 class ProcessorParameters {
 public:

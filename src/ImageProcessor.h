@@ -8,7 +8,7 @@
 /**
  * Responsibility: process an image.
  * Base class for creating custom image processing implementations.
- * Processor configuration is stored in this class.
+ * Processor parameters is stored in this class.
  */
 class ImageProcessor
 {
@@ -16,10 +16,10 @@ public:
     explicit ImageProcessor(std::string name);
 
     /**
-     * Get the current processor configuration
-     * @return the configuration
+     * Get the current processor parameters
+     * @return the parameters
      */
-    ProcessorParameters& getConfiguration();
+    ProcessorParameters& getParameters();
 
     /**
      * Implement this method when creating new image processors
@@ -47,6 +47,6 @@ public:
 
 private:
     std::string name;
-    ProcessorParameters configuration;
+    ProcessorParameters parameters;
     cv::Mat debugImage;
 };

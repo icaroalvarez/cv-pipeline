@@ -67,7 +67,7 @@ void ProcessorParameters::configure(const Configuration &configuration)
                         wrongTypeParameters.append(parameterName+", ");
                     }
                 },
-                [&](std::size_t value)
+                [&](SelectedOptionIndex value)
                 {
                     auto optionParameter{std::get_if<OptionsParameter>(&parameterToBeConfigured)};
                     if(optionParameter)

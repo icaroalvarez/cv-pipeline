@@ -24,7 +24,7 @@ public:
     MockProcessor2()
             :ImageProcessor("mock_processor_2")
     {
-        getConfiguration().registerParameter(parameter1Name, integerParameter);
+        getParameters().registerParameter(parameter1Name, integerParameter);
     }
     MAKE_MOCK1(processImage, cv::Mat(const cv::Mat&), override);
 };

@@ -56,7 +56,7 @@ void PipelineController::configureProcessor(unsigned int index,
                                             const Configuration& configuration)
 {
     checkImageProcessorRange(imageProcessors, index, "Couldn't configure the image processor. ");
-    imageProcessors[index]->getConfiguration().configure(configuration);
+    imageProcessors[index]->getParameters().configure(configuration);
 }
 
 void PipelineController::firePipelineProcessing()
@@ -81,8 +81,8 @@ cv::Mat PipelineController::getDebugImage(unsigned int processorIndex)
 }
 
 Parameters PipelineController::getProcessorParameters(unsigned int processorIndex) const {
-    checkImageProcessorRange(imageProcessors, processorIndex, "Couldn't get image processor configuration. ");
-    return imageProcessors[processorIndex]->getConfiguration().getParameters();
+    checkImageProcessorRange(imageProcessors, processorIndex, "Couldn't get image processor parameters. ");
+    return imageProcessors[processorIndex]->getParameters().getParameters();
 }
 
 void PipelineController::runIteration()

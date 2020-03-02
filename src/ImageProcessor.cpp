@@ -5,9 +5,9 @@ ImageProcessor::ImageProcessor(std::string name)
 {
 }
 
-ProcessorParameters& ImageProcessor::getConfiguration()
+ProcessorParameters& ImageProcessor::getParameters()
 {
-    return configuration;
+    return parameters;
 }
 
 cv::Mat ImageProcessor::getDebugImage() const {
