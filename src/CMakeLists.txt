@@ -15,9 +15,8 @@ add_library(panoramix
         )
 
 target_link_libraries(panoramix
-        pthread
-        opencv_core
-        opencv_imgcodecs
+        PRIVATE pthread
+        PUBLIC CONAN_PKG::opencv
         )
 
 target_include_directories(panoramix PUBLIC

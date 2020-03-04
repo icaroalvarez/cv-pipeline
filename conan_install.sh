@@ -14,14 +14,12 @@ install () {
 
   if test -f $conan_file_path; then
     cd $1
-    if test -d ".conan"; then
-      echo "${ORANGE}.conan folder already existing in: "$1 \
-            ", remove the .conan folder first if you want to reinstall the dependencies"${NC}
-    else
-      mkdir .conan && cd .conan
-      conan install ..
-      echo ${GREEN}"conan dependencies sucessfully installed in: "$1${NC}
+    if ! test -d ".conan"; then
+      mkdir .conan
     fi
+    cd .conan
+    conan install ..
+    echo ${GREEN}"conan dependencies sucessfully installed in: "$1${NC}
     cd $2
   else
     echo "${ORANGE}Conan file not found: "$conan_file_path${NC}
