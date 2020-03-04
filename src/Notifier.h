@@ -3,15 +3,15 @@
 #include <memory>
 
 /**
- * Responsibility: to notify all the observers registered
+ * Responsibility: notify all the observers registered
  */
 class Notifier
 {
 public:
     void notifyObservers();
 
-    void registerObserver(Observer* observer);
+    void registerObserver(std::shared_ptr<Observer> observer);
 
 private:
-    std::list<Observer*> observerList;
+    std::list<std::shared_ptr<Observer>> observerList;
 };

@@ -1,5 +1,4 @@
 #pragma once
-
 #include <unordered_map>
 #include <any>
 #include <opencv2/core/mat.hpp>
@@ -16,7 +15,7 @@ public:
     explicit ImageProcessor(std::string name);
 
     /**
-     * Get the current processor parameters
+     * Get the image processor parameters
      * @return the parameters
      */
     ProcessorParameters& getParameters();

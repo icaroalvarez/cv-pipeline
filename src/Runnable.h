@@ -1,11 +1,10 @@
 #pragma once
-
 #include <thread>
 #include <condition_variable>
 #include <atomic>
 
 /**
- * Responsability: manages to execute a piece of code in a single thread which is in sleep mode between iterations.
+ * Responsibility: manages to execute a piece of code in a single thread which is in sleep mode between iterations.
  * It starts a thread when created and waits until a single iteration is requested to be executed.
  * When the iteration is finished the thread waits in sleep mode until the next iteration is required.
  * It discards any request received while executing an iteration.
@@ -15,7 +14,6 @@ public:
     Runnable();
     virtual ~Runnable();
     void fireIteration();
-    bool isWaiting();
 
 private:
     void run();

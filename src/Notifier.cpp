@@ -2,13 +2,13 @@
 
 void Notifier::notifyObservers()
 {
-    for(auto& observer : observerList)
+    for(const auto& observer : observerList)
     {
         observer->update();
     }
 }
 
-void Notifier::registerObserver(Observer* observer)
+void Notifier::registerObserver(std::shared_ptr<Observer> observer)
 {
-    observerList.push_back(observer);
+    observerList.push_back(std::move(observer));
 }

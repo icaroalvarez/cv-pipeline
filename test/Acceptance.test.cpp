@@ -209,7 +209,7 @@ SCENARIO("Process an image through the pipeline")
             REQUIRE_CALL(*mockObserver, update())
             .LR_SIDE_EFFECT(observerUpdated = true);
 
-            controller->registerObserver(mockObserver.get());
+            controller->registerObserver(mockObserver);
 
             AND_WHEN("Pipeline processing is fired")
             {

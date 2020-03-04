@@ -10,7 +10,7 @@ void ImageFrameSource::loadFrom(const std::string &path)
     }
 }
 
-unsigned int ImageFrameSource::framesCount()
+unsigned int ImageFrameSource::framesCount() const
 {
     if(image.empty())
     {

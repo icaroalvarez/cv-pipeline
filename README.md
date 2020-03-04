@@ -27,3 +27,14 @@ mkdir build && cd build
 cmake ..
 make
 ```
+
+## Technical Features
+- Modern C++11/14/17.
+- Testing witch Catch2 and mocking with Trompeloeil.
+- Testing coverage using lcov. 
+- Build system with Modern CMake.
+- Conan as dependency manager.
+- Design patterns: factory, observer, 
+- Multi-threading synchronization with condition variables.
+- Template specialization
+- std::variant with std::visit

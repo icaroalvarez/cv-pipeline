@@ -6,7 +6,7 @@ class ImageFrameSource
 public:
     void loadFrom(const std::string& path);
 
-    unsigned int framesCount();
+    unsigned int framesCount() const;
 
     cv::Mat getFrameFromIndex(unsigned int index);
 
