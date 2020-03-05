@@ -38,6 +38,7 @@ make
 - Multi-threading synchronization with condition variables.
 - Template specialization
 - C++17 std::variant and std::visit usage.
+- Nested subprojects with git submodules.
 
 ## TODO
 - Add video frame source support (now only single image is supported).
