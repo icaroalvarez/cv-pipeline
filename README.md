@@ -32,6 +32,7 @@ make
 - Modern C++11/14/17.
 - Testing witch Catch2 and mocking with Trompeloeil.
 - Testing coverage using lcov. 
+- Acceptance Test Driven Development (ATDD) and Behavior-Driven Development (BDD).
 - Build system with Modern CMake.
 - Conan as dependency manager.
 - Design patterns: factory, observer, 

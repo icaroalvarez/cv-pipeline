@@ -110,3 +110,11 @@ void PipelineController::setFrameSourceIndex(unsigned index)
     }
     frameSourceIndex = index;
 }
+
+void PipelineController::loadPipelineFromJson(const nlohmann::json &configurationFile)
+{
+    const std::string imageSourcePath{configurationFile.at("input_image_path")};
+    loadFrameSourceFrom(imageSourcePath);
+    const std::vector<std::string> imageProcessorNames = configurationFile.at("image_processors_to_be_loaded");
+    loadPipeline(imageProcessorNames);
+}

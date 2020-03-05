@@ -16,7 +16,7 @@ add_library(panoramix
 
 target_link_libraries(panoramix
         PRIVATE pthread
-        PUBLIC CONAN_PKG::opencv
+        PUBLIC CONAN_PKG::opencv CONAN_PKG::jsonformoderncpp
         )
 
 target_include_directories(panoramix PUBLIC

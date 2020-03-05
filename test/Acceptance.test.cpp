@@ -5,6 +5,7 @@
 #include "trompeloeil.hpp"
 #include "catch2/catch.hpp"
 #include "PipelineController.h"
+#include <nlohmann/json.hpp>
 
 class MockProcessor1: public ImageProcessor
 {
@@ -67,7 +68,7 @@ SCENARIO("A frame source can be loaded", "[acceptance]")
         THEN("Throw if frame source index is set before been loaded")
         {
             CHECK_THROWS_WITH(controller.setFrameSourceIndex(1),
-                    "Frame source is not loaded yet, index cannot be set");
+                              "Frame source is not loaded yet, index cannot be set");
         }
 
         THEN("Fails loading a non existing frame source")
@@ -92,6 +93,31 @@ SCENARIO("A frame source can be loaded", "[acceptance]")
             {
                 CHECK_NOTHROW(controller.setFrameSourceIndex(0));
             }
+        }
+    }
+}
+
+using json=nlohmann::json;
+json createPipelineConfigurationFile()
+{
+    return {
+            {"input_image_path", fixtures_path"/Lenna.png"},
+            {"image_processors_to_be_loaded",
+                    std::vector<std::string>{"image_processor_1", "image_processor_2"}}
+    };
+}
+
+SCENARIO("Pipeline configuration can be loaded from json")
+{
+    GIVEN("A pipeline controller with two image processor registered")
+    {
+        PipelineController controller;
+        controller.registerImageProcessor<MockProcessor1>("image_processor_1");
+        controller.registerImageProcessor<MockProcessor2>("image_processor_2");
+
+        THEN("Loads correctly the pipeline configuration from a json configuration file")
+        {
+            REQUIRE_NOTHROW(controller.loadPipelineFromJson(createPipelineConfigurationFile()));
         }
     }
 }
@@ -234,12 +260,12 @@ SCENARIO("Process an image through the pipeline")
                         constexpr auto processor1Index{0};
                         const auto debugImageProcessor1{controller->getDebugImage(processor1Index)};
                         REQUIRE(std::equal(debugImageProcessor1.begin<uchar>(), debugImageProcessor1.end<uchar>(),
-                                dummyDebugImageProcessor1.begin<uchar>()));
+                                           dummyDebugImageProcessor1.begin<uchar>()));
 
                         constexpr auto processor2Index{1};
                         const auto debugImageProcessor2{controller->getDebugImage(processor2Index)};
                         REQUIRE(std::equal(debugImageProcessor2.begin<uchar>(), debugImageProcessor2.end<uchar>(),
-                                   dummyDebugImageProcessor2.begin<uchar>()));
+                                           dummyDebugImageProcessor2.begin<uchar>()));
                     }
                 }
             }

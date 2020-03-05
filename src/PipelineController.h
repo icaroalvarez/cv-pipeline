@@ -6,6 +6,7 @@
 #include "ImageFrameSource.h"
 #include <any>
 #include <opencv2/core/mat.hpp>
+#include <nlohmann/json.hpp>
 
 /**
  * Responsibility: allows to control the pipeline from the outside (a GUI for example).
@@ -36,6 +37,16 @@ public:
      */
     void loadFrameSourceFrom(const std::string& path);
 
+    /**
+     * Load pipeline configuration from json file (image processors and frame source)
+     * @param configurationFile the configuration file to be loaded
+     */
+    void loadPipelineFromJson(const nlohmann::json& configurationFile);
+
+    /**
+     * Set frame source index to be loaded when the pipeline processor is fired
+     * @param index of the image to be processed through the pipeline
+     */
     void setFrameSourceIndex(unsigned int index);
 
     /**
