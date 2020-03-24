@@ -23,7 +23,7 @@ SCENARIO("Loads an image")
 
         WHEN("An existing image path is loaded")
         {
-            const std::string imageSourcePath{fixtures_path"Lenna.png"};
+            const std::string imageSourcePath{fixtures_path"/images/Lenna.png"};
             REQUIRE_NOTHROW(frameSource.loadFrom(imageSourcePath));
 
             THEN("Frame index count is correct")
@@ -39,7 +39,7 @@ SCENARIO("Loads an image")
 
             THEN("The image is retrieve with a correct index number")
             {
-                cv::Mat lennaImage{cv::imread(fixtures_path"Lenna.png")};
+                cv::Mat lennaImage{cv::imread(fixtures_path"images/Lenna.png")};
                 auto frame{frameSource.getFrameFromIndex(0)};
                 CHECK(std::equal(lennaImage.begin<uchar>(), lennaImage.end<uchar>(), frame.begin<uchar>()));
             }

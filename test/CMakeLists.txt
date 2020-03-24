@@ -7,6 +7,7 @@ set(test_source_files
         ProcessorParameters.Test.cpp
         Runnable.Test.cpp
         ImageFrameSource.Test.cpp
+        VideoFrameSource.Test.cpp
         )
 
 add_executable(test_panoramix

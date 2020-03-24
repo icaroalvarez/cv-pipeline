@@ -8,7 +8,9 @@ set(source_files
         Notifier
         ProcessorParameters
         Runnable
-        ImageFrameSource)
+        ImageFrameSource
+        FrameSource
+        VideoFrameSource)
 
 add_library(panoramix
         ${source_files}

@@ -105,8 +105,9 @@ void PipelineController::setFrameSourceIndex(unsigned index)
     const auto framesCount{frameSource->framesCount()};
     if(index >= framesCount)
     {
+        const auto maxIndex{std::max(static_cast<int>(framesCount-1), 0)};
         throw std::invalid_argument("Frame source index out of bound (requested: "+
-                                    std::to_string(index)+", max: "+std::to_string(framesCount-1)+")");
+                                    std::to_string(index)+", max: "+std::to_string(maxIndex)+")");
     }
     frameSourceIndex = index;
 }

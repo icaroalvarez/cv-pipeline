@@ -80,8 +80,8 @@ SCENARIO("A frame source can be loaded", "[acceptance]")
 
         THEN("Load successfully a existing frame source")
         {
-            constexpr auto path{fixtures_path"Lenna.png"};
-            CHECK_NOTHROW(controller.loadFrameSourceFrom(path));
+            constexpr auto path{fixtures_path"/images/Lenna.png"};
+            REQUIRE_NOTHROW(controller.loadFrameSourceFrom(path));
 
             AND_THEN("Fails setting incorrect frame source index")
             {
@@ -101,7 +101,7 @@ using json=nlohmann::json;
 json createPipelineConfigurationFile()
 {
     return {
-            {"input_image_path", fixtures_path"/Lenna.png"},
+            {"input_image_path", fixtures_path"/images/Lenna.png"},
             {"image_processors_to_be_loaded",
                     std::vector<std::string>{"image_processor_1", "image_processor_2"}}
     };
@@ -130,7 +130,7 @@ std::unique_ptr<PipelineController> createPipelineController()
     const std::vector<std::string> pipeline = {"image_processor_1", "image_processor_2"};
     controller->loadPipeline(pipeline);
 
-    constexpr auto frameSourcePath{fixtures_path"Lenna.png"};
+    constexpr auto frameSourcePath{fixtures_path"/images/Lenna.png"};
     controller->loadFrameSourceFrom(frameSourcePath);
     return std::move(controller);
 }
@@ -206,7 +206,8 @@ SCENARIO("Process an image through the pipeline")
     GIVEN("A pipeline with two image processors and a frame source loaded")
     {
         auto dummyImagesValueIndex{0};
-        cv::Mat lennaImage{cv::imread(fixtures_path"Lenna.png")};
+        cv::Mat lennaImage{cv::imread(fixtures_path"/images/Lenna.png")};
+        REQUIRE_FALSE(lennaImage.empty());
         auto controller{std::make_unique<PipelineController>()};
         auto imageProcessor1{std::make_unique<MockProcessor1>()};
         cv::Mat dummyDebugImageProcessor1{(dummyImagesValueIndex++)*cv::Mat::ones(10, 10, CV_8U)};
@@ -225,7 +226,7 @@ SCENARIO("Process an image through the pipeline")
         controller->addImageProcessor(std::move(imageProcessor1));
         controller->addImageProcessor(std::move(imageProcessor2));
 
-        constexpr auto frameSourcePath{fixtures_path"Lenna.png"};
+        constexpr auto frameSourcePath{fixtures_path"/images/Lenna.png"};
         REQUIRE_NOTHROW(controller->loadFrameSourceFrom(frameSourcePath));
 
         WHEN("An observer is registered")

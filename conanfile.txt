@@ -6,3 +6,6 @@ jsonformoderncpp/3.7.3@vthiery/stable
 
 [generators]
 cmake
+
+[options]
+opencv:ffmpeg=True

@@ -6,9 +6,10 @@ message("CMake build type: " ${CMAKE_BUILD_TYPE})
 
 include(.conan/conanbuildinfo.cmake)
 get_directory_property(hasParent PARENT_DIRECTORY)
-if(!hasParent)
+if(NOT hasParent)
     conan_basic_setup(TARGETS)
 endif()
+
 
 find_package(Threads)
 
