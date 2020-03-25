@@ -1,6 +1,7 @@
 #include <opencv2/imgcodecs.hpp>
 #include <thread>
 #include "PipelineController.h"
+#include "FrameSourceFactory.h"
 
 void PipelineController::loadPipeline(const std::vector<std::string>& imageProcessorNames)
 {
@@ -35,8 +36,7 @@ std::vector<std::string> PipelineController::getPipelineDescription() const
 
 void PipelineController::loadFrameSourceFrom(const std::string &path)
 {
-    frameSource = std::make_unique<ImageFrameSource>();
-    frameSource->loadFrom(path);
+    frameSource = std::move(FrameSourceFactory::createAndLoadFromPath(path));
     frameSourceIndex = 0;
 }
 

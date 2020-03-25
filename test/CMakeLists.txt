@@ -8,6 +8,7 @@ set(test_source_files
         Runnable.Test.cpp
         ImageFrameSource.Test.cpp
         VideoFrameSource.Test.cpp
+        FrameSourceFactory.Test.cpp
         )
 
 add_executable(test_panoramix

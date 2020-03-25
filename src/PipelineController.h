@@ -3,7 +3,7 @@
 #include "Factory.h"
 #include "Notifier.h"
 #include "Runnable.h"
-#include "ImageFrameSource.h"
+#include "FrameSource.h"
 #include <any>
 #include <opencv2/core/mat.hpp>
 #include <nlohmann/json.hpp>
@@ -102,7 +102,7 @@ private:
     std::vector<std::unique_ptr<ImageProcessor>> imageProcessors;
     Factory<ImageProcessor> imageProcessorFactory;
     cv::Mat currentImage;
-    std::unique_ptr<ImageFrameSource> frameSource;
+    std::unique_ptr<FrameSource> frameSource;
     unsigned int frameSourceIndex;
 
     void runIteration() override;

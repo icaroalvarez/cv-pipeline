@@ -74,7 +74,8 @@ SCENARIO("A frame source can be loaded", "[acceptance]")
         THEN("Fails loading a non existing frame source")
         {
             const auto path{"non_existing_path"};
-            const auto exceptionMessage{std::string("Unable to load image from: ")+path};
+            const auto exceptionMessage{std::string("Not able to create frame source from path: ")+path
+                                        +". Files supported: .jpg, .png, .bmp, .mp4."};
             CHECK_THROWS_WITH(controller.loadFrameSourceFrom(path), exceptionMessage);
         }
 
