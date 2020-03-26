@@ -18,8 +18,13 @@ add_library(panoramix
         )
 
 target_link_libraries(panoramix
-        PRIVATE pthread
-        PUBLIC CONAN_PKG::opencv CONAN_PKG::jsonformoderncpp stdc++fs
+        PRIVATE
+            pthread
+        PUBLIC
+            CONAN_PKG::opencv
+            CONAN_PKG::jsonformoderncpp
+            CONAN_PKG::easyloggingpp
+            stdc++fs
         )
 
 target_include_directories(panoramix PUBLIC

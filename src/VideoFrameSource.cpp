@@ -4,7 +4,7 @@ void VideoFrameSource::loadFrom(const std::string& path)
 {
     this->path = path;
 
-    if(!videoCapture.open(path))
+    if(not videoCapture.open(path))
     {
         throw std::invalid_argument("Video frame source not able to open video at: "+path);
     }
@@ -43,7 +43,8 @@ cv::Mat VideoFrameSource::getFrameFromIndex(unsigned int index)
     }
 
     cv::Mat image;
-    if(!videoCapture.read(image))
+    videoCapture.read(image);
+    if(not videoCapture.read(image))
     {
         throw std::runtime_error("Error while reading image from: "+path);
     }

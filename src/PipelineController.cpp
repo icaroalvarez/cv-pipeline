@@ -2,6 +2,7 @@
 #include <thread>
 #include "PipelineController.h"
 #include "FrameSourceFactory.h"
+#include "easylogging++.h"
 
 void PipelineController::loadPipeline(const std::vector<std::string>& imageProcessorNames)
 {
@@ -87,13 +88,20 @@ Parameters PipelineController::getProcessorParameters(unsigned int processorInde
 
 void PipelineController::runIteration()
 {
-    currentImage = frameSource->getFrameFromIndex(frameSourceIndex);
-    cv::Mat imageFromPreviousProcessor{currentImage};
-    for(const auto& processor: imageProcessors)
+    try
     {
-        imageFromPreviousProcessor = processor->processImage(imageFromPreviousProcessor);
+        currentImage = frameSource->getFrameFromIndex(frameSourceIndex);
+        cv::Mat imageFromPreviousProcessor{currentImage};
+        for(const auto& processor: imageProcessors)
+        {
+            imageFromPreviousProcessor = processor->processImage(imageFromPreviousProcessor);
+        }
+        notifyObservers();
     }
-    notifyObservers();
+    catch(const std::exception& e)
+    {
+        LOG(ERROR) << "Error running pipeline controller: " << e.what();
+    }
 }
 
 void PipelineController::setFrameSourceIndex(unsigned index)
@@ -118,4 +126,9 @@ void PipelineController::loadPipelineFromJson(const nlohmann::json &configuratio
     loadFrameSourceFrom(imageSourcePath);
     const std::vector<std::string> imageProcessorNames = configurationFile.at("image_processors_to_be_loaded");
     loadPipeline(imageProcessorNames);
+}
+
+unsigned int PipelineController::getTotalFrames() const
+{
+    return frameSource->framesCount();
 }

@@ -98,6 +98,8 @@ public:
         imageProcessorFactory.registerMaker<T>(processorName);
     }
 
+    unsigned int getTotalFrames() const;
+
 private:
     std::vector<std::unique_ptr<ImageProcessor>> imageProcessors;
     Factory<ImageProcessor> imageProcessorFactory;
