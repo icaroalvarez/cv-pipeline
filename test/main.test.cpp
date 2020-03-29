@@ -2,6 +2,9 @@
 #define CATCH_CONFIG_RUNNER
 #include "catch2/catch.hpp"
 #include "trompeloeil.hpp"
+#include "easylogging++.h"
+
+INITIALIZE_EASYLOGGINGPP
 
 int main( int argc, char* argv[] ) {
 

@@ -1,0 +1,40 @@
+{
+  "frame_source_path": "frame_source_path",
+  "image_processors": [
+    {
+      "name": "processor1",
+      "configuration": [
+        {
+          "parameter_name": "parameter_boolean",
+          "parameter_type": "boolean",
+          "value": true
+        },
+        {
+          "parameter_name": "parameter_options",
+          "parameter_type": "options",
+          "value": 1
+        },
+        {
+          "parameter_name": "parameter_decimal",
+          "parameter_type": "decimal",
+          "value": 1.0
+        },
+        {
+          "parameter_name": "parameter_integer",
+          "parameter_type": "integer",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "name": "processor2",
+      "configuration": [
+        {
+          "parameter_name": "parameter_integer",
+          "parameter_type": "integer",
+          "value": 2
+        }
+      ]
+    }
+  ]
+}

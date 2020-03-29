@@ -42,12 +42,12 @@ SCENARIO("Loads a video frame source")
             THEN("The image is retrieve with a correct index number")
             {
                 constexpr auto totalFrames{10};
-                for(auto iFrame = 0; iFrame < totalFrames; iFrame += 2)
+                for(auto iFrame = 0; iFrame < totalFrames; iFrame ++)
                 {
                     const auto frame{frameSource.getFrameFromIndex(iFrame)};
-
                     const auto framePath{fixtures_path"images/chaplin/chaplin_frame_"
                                          +std::to_string(iFrame)+".bmp"};
+                    //cv::imwrite(framePath, frame);
                     const auto chaplinFrame{cv::imread(framePath)};
                     CHECK(std::equal(frame.begin<uchar>(), frame.end<uchar>(), chaplinFrame.begin<uchar>()));
                 }

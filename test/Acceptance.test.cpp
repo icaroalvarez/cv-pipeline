@@ -6,57 +6,37 @@
 #include "catch2/catch.hpp"
 #include "PipelineController.h"
 #include <nlohmann/json.hpp>
+#include <PipelineConfiguration.h>
 
-class MockProcessor1: public ImageProcessor
+constexpr auto parameterIntegerName{"parameter_integer"};
+constexpr auto parameterIntegerValue{1};
+constexpr auto processor2ParameterIntegerValue{2};
+
+Configuration createExpectedConfigurationProcessor1()
 {
-public:
-    MockProcessor1()
-            : ImageProcessor("mock_processor_1"){};
+    Configuration configuration;
+    configuration[parameterIntegerName] = parameterIntegerValue;
+    return configuration;
+}
 
-    MAKE_MOCK1(processImage, cv::Mat(const cv::Mat&), override);
-};
-
-constexpr auto parameter1Name{"parameter_1"};
-constexpr auto integerParameter{IntegerParameter{1, 0, 100}};
-
-class MockProcessor2: public ImageProcessor
+Configuration createExpectedConfigurationProcessor2()
 {
-public:
-    MockProcessor2()
-            :ImageProcessor("mock_processor_2")
-    {
-        getParameters().registerParameter(parameter1Name, integerParameter);
-    }
-    MAKE_MOCK1(processImage, cv::Mat(const cv::Mat&), override);
-};
+    Configuration configuration;
+    configuration[parameterIntegerName] = processor2ParameterIntegerValue;
+    return configuration;
+}
 
-SCENARIO("An image processor pipeline can be loaded")
+constexpr auto frameSourcePathValue{fixtures_path"images/Lenna.png"};
+constexpr auto processor1Name{"processor1"};
+constexpr auto processor2Name{"processor2"};
+
+PipelineConfiguration createPipelineConfiguration()
 {
-    GIVEN("A pipeline controller")
-    {
-        PipelineController controller;
-
-        WHEN("Two image processors are registered")
-        {
-            controller.registerImageProcessor<MockProcessor1>("mock_processor_1");
-            controller.registerImageProcessor<MockProcessor2>("mock_processor_2");
-
-            THEN("Fails loading a pipeline with not previously registered image processors.")
-            {
-                const std::vector<std::string> pipeline{"non_existing_processor1", "non_existing_processor2"};
-                constexpr auto exceptionMessage{
-                        "Couldn't load pipeline, processors not found: non_existing_processor1, non_existing_processor2"};
-                CHECK_THROWS_WITH(controller.loadPipeline(pipeline), exceptionMessage);
-            }
-
-            THEN("Successfully loads a pipeline with previously registered image processors")
-            {
-                const std::vector<std::string> pipelineDescription{"mock_processor_1", "mock_processor_2"};
-                CHECK_NOTHROW(controller.loadPipeline(pipelineDescription));
-                CHECK(controller.getPipelineDescription() == pipelineDescription);
-            }
-        }
-    }
+    PipelineConfiguration configuration;
+    configuration.frameSourcePath = frameSourcePathValue;
+    configuration.imageProcessors.emplace_back(processor1Name, std::move(createExpectedConfigurationProcessor1()));
+    configuration.imageProcessors.emplace_back(processor2Name, std::move(createExpectedConfigurationProcessor2()));
+    return configuration;
 }
 
 SCENARIO("A frame source can be loaded", "[acceptance]")
@@ -98,49 +78,40 @@ SCENARIO("A frame source can be loaded", "[acceptance]")
     }
 }
 
-using json=nlohmann::json;
-json createPipelineConfigurationFile()
-{
-    return {
-            {"input_image_path", fixtures_path"/images/Lenna.png"},
-            {"image_processors_to_be_loaded",
-                    std::vector<std::string>{"image_processor_1", "image_processor_2"}}
-    };
-}
+constexpr auto integerParameter{IntegerParameter{1, 0, 100}};
 
-SCENARIO("Pipeline configuration can be loaded from json")
+class MockProcessor1: public ImageProcessor
 {
-    GIVEN("A pipeline controller with two image processor registered")
+public:
+    MockProcessor1()
+            : ImageProcessor(processor1Name)
     {
-        PipelineController controller;
-        controller.registerImageProcessor<MockProcessor1>("image_processor_1");
-        controller.registerImageProcessor<MockProcessor2>("image_processor_2");
+        getParameters().registerParameter(parameterIntegerName, integerParameter);
+    };
 
-        THEN("Loads correctly the pipeline configuration from a json configuration file")
-        {
-            REQUIRE_NOTHROW(controller.loadPipelineFromJson(createPipelineConfigurationFile()));
-        }
-    }
-}
+    MAKE_MOCK1(processImage, cv::Mat(const cv::Mat&), override);
+};
 
-std::unique_ptr<PipelineController> createPipelineController()
+class MockProcessor2: public ImageProcessor
 {
-    auto controller{std::make_unique<PipelineController>()};
-    controller->registerImageProcessor<MockProcessor1>("image_processor_1");
-    controller->registerImageProcessor<MockProcessor2>("image_processor_2");
-    const std::vector<std::string> pipeline = {"image_processor_1", "image_processor_2"};
-    controller->loadPipeline(pipeline);
-
-    constexpr auto frameSourcePath{fixtures_path"/images/Lenna.png"};
-    controller->loadFrameSourceFrom(frameSourcePath);
-    return std::move(controller);
-}
+public:
+    MockProcessor2()
+            :ImageProcessor(std::string(processor2Name))
+    {
+        getParameters().registerParameter(parameterIntegerName, integerParameter);
+    }
+    MAKE_MOCK1(processImage, cv::Mat(const cv::Mat&), override);
+};
 
 SCENARIO("A pipeline's image processor can be configured")
 {
     GIVEN("A pipeline successfully loaded")
     {
-        auto controller{createPipelineController()};
+        auto controller{std::make_unique<PipelineController>()};
+        controller->registerImageProcessor<MockProcessor1>(processor1Name);
+        controller->registerImageProcessor<MockProcessor2>(processor2Name);
+        controller->loadPipeline(createPipelineConfiguration());
+
         THEN("It fails if incorrect image processor index is configured")
         {
             constexpr auto imageProcessorIndex{3};
@@ -165,14 +136,80 @@ SCENARIO("A pipeline's image processor can be configured")
         {
             constexpr auto imageProcessor2Index{1};
             constexpr auto parameter1NewValue{2};
-            Configuration configuration{{parameter1Name, parameter1NewValue}};
+            Configuration configuration{{parameterIntegerName, parameter1NewValue}};
             CHECK_NOTHROW(controller->configureProcessor(imageProcessor2Index, configuration));
 
             auto newIntegerParameter{integerParameter};
             newIntegerParameter.value = parameter1NewValue;
-            Parameters expectedParameters{{parameter1Name, newIntegerParameter}};
+            Parameters expectedParameters{{parameterIntegerName, newIntegerParameter}};
             const auto parameters{controller->getProcessorParameters(imageProcessor2Index)};
             REQUIRE(parameters == expectedParameters);
+        }
+    }
+}
+
+nlohmann::json createProcessorConfiguration(int parameterValue)
+{
+    return {
+            {
+                    {"parameter_name", parameterIntegerName},
+                    {"parameter_type", "integer"},
+                    {"value", parameterValue}
+            }
+    };
+}
+
+nlohmann::json createProcessorsConfiguration()
+{
+    return {
+            {
+                    {"name", processor1Name},
+                    {"configuration", createProcessorConfiguration(parameterIntegerValue)}
+            },
+            {
+                    {"name", processor2Name},
+                    {"configuration", createProcessorConfiguration(processor2ParameterIntegerValue)}
+            }
+    };
+}
+
+nlohmann::json createPipelineConfigurationJson()
+{
+    return nlohmann::json{
+            {"frame_source_path", frameSourcePathValue},
+            {"image_processors",  createProcessorsConfiguration()}
+    };
+}
+
+SCENARIO("Pipeline can be loaded using a pipeline configuration")
+{
+    GIVEN("A pipeline controller with two image processor registered")
+    {
+        PipelineController controller;
+        controller.registerImageProcessor<MockProcessor1>(processor1Name);
+        controller.registerImageProcessor<MockProcessor2>(processor2Name);
+        const auto pipelineConfiguration{createPipelineConfiguration()};
+
+        WHEN("Pipeline configuration is loaded")
+        {
+            REQUIRE_NOTHROW(controller.loadPipeline(pipelineConfiguration));
+
+            THEN("Pipeline is correctly configured")
+            {
+                const auto configuration{controller.getPipelineConfiguration()};
+                CHECK(configuration == pipelineConfiguration);
+            }
+        }
+
+        WHEN("Pipeline configuration is loaded from a json file")
+        {
+            REQUIRE_NOTHROW(controller.loadPipelineFromJson(createPipelineConfigurationJson()));
+
+            THEN("Pipeline is correctly configured")
+            {
+                const auto configuration{controller.getPipelineConfiguration()};
+                CHECK(configuration == pipelineConfiguration);
+            }
         }
     }
 }

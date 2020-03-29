@@ -11,7 +11,9 @@ set(source_files
         ImageFrameSource
         FrameSource
         VideoFrameSource
-        FrameSourceFactory)
+        FrameSourceFactory
+        PipelineConfiguration
+        JsonStorage)
 
 add_library(panoramix
         ${source_files}

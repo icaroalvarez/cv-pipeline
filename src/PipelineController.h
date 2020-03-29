@@ -4,6 +4,7 @@
 #include "Notifier.h"
 #include "Runnable.h"
 #include "FrameSource.h"
+#include "PipelineConfiguration.h"
 #include <any>
 #include <opencv2/core/mat.hpp>
 #include <nlohmann/json.hpp>
@@ -19,11 +20,13 @@ class PipelineController: public Notifier, Runnable
 {
 public:
 
+    void loadPipeline(const PipelineConfiguration& configuration);
+
     /**
-     * Load a set of image processors into the pipeline
-     * @param imageProcessorNames the names of the image processors to be loaded
-     */
-    void loadPipeline(const std::vector<std::string>& imageProcessorNames);
+    * Load pipeline configuration from json file (image processors and frame source)
+    * @param configurationFile the configuration file to be loaded
+    */
+    void loadPipelineFromJson(const nlohmann::json& configurationFile);
 
     /**
      * Get a list of image processors loaded in the pipeline
@@ -37,11 +40,7 @@ public:
      */
     void loadFrameSourceFrom(const std::string& path);
 
-    /**
-     * Load pipeline configuration from json file (image processors and frame source)
-     * @param configurationFile the configuration file to be loaded
-     */
-    void loadPipelineFromJson(const nlohmann::json& configurationFile);
+    PipelineConfiguration getPipelineConfiguration() const;
 
     /**
      * Set frame source index to be loaded when the pipeline processor is fired
@@ -106,6 +105,7 @@ private:
     cv::Mat currentImage;
     std::unique_ptr<FrameSource> frameSource;
     unsigned int frameSourceIndex;
+    std::string frameSourcePath;
 
     void runIteration() override;
 };
