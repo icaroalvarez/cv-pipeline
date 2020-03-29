@@ -26,7 +26,7 @@ Configuration createExpectedConfigurationProcessor2()
     return configuration;
 }
 
-constexpr auto frameSourcePathValue{fixtures_path"images/Lenna.png"};
+constexpr auto frameSourcePathValue{"frame_source_path"};
 constexpr auto processor1Name{"processor1"};
 constexpr auto processor2Name{"processor2"};
 
@@ -103,20 +103,37 @@ public:
     MAKE_MOCK1(processImage, cv::Mat(const cv::Mat&), override);
 };
 
+class FrameSourceMock : public FrameSource
+{
+    MAKE_MOCK1(loadFrom, void(const std::string &), override);
+    MAKE_CONST_MOCK0(framesCount, unsigned int(), override);
+    MAKE_MOCK1(getFrameFromIndex, cv::Mat(unsigned int), override);
+};
+
+class FrameSourceFactoryMock : public FrameSourceFactory
+{
+    MAKE_MOCK1(createAndLoadFromPath, std::unique_ptr<FrameSource>(const std::string&), override);
+};
+
 SCENARIO("A pipeline's image processor can be configured")
 {
     GIVEN("A pipeline successfully loaded")
     {
-        auto controller{std::make_unique<PipelineController>()};
-        controller->registerImageProcessor<MockProcessor1>(processor1Name);
-        controller->registerImageProcessor<MockProcessor2>(processor2Name);
-        controller->loadPipeline(createPipelineConfiguration());
+        auto frameSourceMock{std::make_unique<FrameSourceMock>()};
+        auto frameSourceFactoryMock{std::make_unique<FrameSourceFactoryMock>()};
+        REQUIRE_CALL(*frameSourceFactoryMock, createAndLoadFromPath(frameSourcePathValue))
+        .LR_RETURN(std::move(frameSourceMock));
+
+        PipelineController controller{std::move(frameSourceFactoryMock)};
+        controller.registerImageProcessor<MockProcessor1>(processor1Name);
+        controller.registerImageProcessor<MockProcessor2>(processor2Name);
+        controller.loadPipeline(createPipelineConfiguration());
 
         THEN("It fails if incorrect image processor index is configured")
         {
             constexpr auto imageProcessorIndex{3};
             const auto exceptionMessage{std::string{"Couldn't configure the image processor. The index 3 is out of range (2)"}};
-            CHECK_THROWS_WITH(controller->configureProcessor(imageProcessorIndex, {}), exceptionMessage);
+            CHECK_THROWS_WITH(controller.configureProcessor(imageProcessorIndex, {}), exceptionMessage);
         }
 
         THEN("It fails if the Image processor is configured with incorrect parameters")
@@ -127,7 +144,7 @@ SCENARIO("A pipeline's image processor can be configured")
             Configuration configuration{{parameterName, 1}, {parameterName2, 2}};
             const auto exceptionMessage{std::string{"Couldn't configure image processor. Parameters not found: "}
                                         +parameterName+", "+parameterName2};
-            CHECK_THROWS_WITH(controller->configureProcessor(imageProcessorIndex, configuration),
+            CHECK_THROWS_WITH(controller.configureProcessor(imageProcessorIndex, configuration),
                               Catch::Contains("Couldn't configure image processor. Parameters not found: ")
                               && Catch::Contains(parameterName) && Catch::Contains(parameterName2));
         }
@@ -137,12 +154,12 @@ SCENARIO("A pipeline's image processor can be configured")
             constexpr auto imageProcessor2Index{1};
             constexpr auto parameter1NewValue{2};
             Configuration configuration{{parameterIntegerName, parameter1NewValue}};
-            CHECK_NOTHROW(controller->configureProcessor(imageProcessor2Index, configuration));
+            CHECK_NOTHROW(controller.configureProcessor(imageProcessor2Index, configuration));
 
             auto newIntegerParameter{integerParameter};
             newIntegerParameter.value = parameter1NewValue;
             Parameters expectedParameters{{parameterIntegerName, newIntegerParameter}};
-            const auto parameters{controller->getProcessorParameters(imageProcessor2Index)};
+            const auto parameters{controller.getProcessorParameters(imageProcessor2Index)};
             REQUIRE(parameters == expectedParameters);
         }
     }
@@ -185,7 +202,12 @@ SCENARIO("Pipeline can be loaded using a pipeline configuration")
 {
     GIVEN("A pipeline controller with two image processor registered")
     {
-        PipelineController controller;
+        auto frameSourceMock{std::make_unique<FrameSourceMock>()};
+        auto frameSourceFactoryMock{std::make_unique<FrameSourceFactoryMock>()};
+        REQUIRE_CALL(*frameSourceFactoryMock, createAndLoadFromPath(frameSourcePathValue))
+        .LR_RETURN(std::move(frameSourceMock));
+
+        PipelineController controller(std::move(frameSourceFactoryMock));
         controller.registerImageProcessor<MockProcessor1>(processor1Name);
         controller.registerImageProcessor<MockProcessor2>(processor2Name);
         const auto pipelineConfiguration{createPipelineConfiguration()};
@@ -196,19 +218,31 @@ SCENARIO("Pipeline can be loaded using a pipeline configuration")
 
             THEN("Pipeline is correctly configured")
             {
-                const auto configuration{controller.getPipelineConfiguration()};
-                CHECK(configuration == pipelineConfiguration);
+                const auto currentConfiguration{controller.getPipelineConfiguration()};
+                CHECK(currentConfiguration == pipelineConfiguration);
             }
         }
 
-        WHEN("Pipeline configuration is loaded from a json file")
+        WHEN("Pipeline configuration is loaded from json")
         {
             REQUIRE_NOTHROW(controller.loadPipelineFromJson(createPipelineConfigurationJson()));
 
             THEN("Pipeline is correctly configured")
             {
-                const auto configuration{controller.getPipelineConfiguration()};
-                CHECK(configuration == pipelineConfiguration);
+                const auto currentConfiguration{controller.getPipelineConfiguration()};
+                CHECK(currentConfiguration == pipelineConfiguration);
+            }
+        }
+
+        WHEN("Pipeline configuration is loaded from a json file")
+        {
+            const auto path{fixtures_path"/json/acceptance_configuration.json"};
+            REQUIRE_NOTHROW(controller.loadPipelineFromJsonFile(path));
+
+            THEN("Pipeline is correctly configured")
+            {
+                const auto currentConfiguration{controller.getPipelineConfiguration()};
+                CHECK(currentConfiguration == pipelineConfiguration);
             }
         }
     }
@@ -243,10 +277,17 @@ SCENARIO("Process an image through the pipeline")
 {
     GIVEN("A pipeline with two image processors and a frame source loaded")
     {
-        auto dummyImagesValueIndex{0};
+        auto frameSourceMock{std::make_unique<FrameSourceMock>()};
         cv::Mat lennaImage{cv::imread(fixtures_path"/images/Lenna.png")};
+        REQUIRE_CALL(*frameSourceMock, getFrameFromIndex(0)).RETURN(lennaImage);
+
+        auto frameSourceFactoryMock{std::make_unique<FrameSourceFactoryMock>()};
+        REQUIRE_CALL(*frameSourceFactoryMock, createAndLoadFromPath(frameSourcePathValue))
+        .LR_RETURN(std::move(frameSourceMock));
+
+        auto dummyImagesValueIndex{0};
         REQUIRE_FALSE(lennaImage.empty());
-        auto controller{std::make_unique<PipelineController>()};
+        PipelineController controller(std::move(frameSourceFactoryMock));
         auto imageProcessor1{std::make_unique<MockProcessor1>()};
         cv::Mat dummyDebugImageProcessor1{(dummyImagesValueIndex++)*cv::Mat::ones(10, 10, CV_8U)};
         imageProcessor1->setDebugImage(dummyDebugImageProcessor1);
@@ -261,11 +302,10 @@ SCENARIO("Process an image through the pipeline")
         REQUIRE_CALL(*imageProcessor2, processImage(image_matcher(dummyImageProcessor1Output)))
         .LR_RETURN(dummyImageProcessor2Output);
 
-        controller->addImageProcessor(std::move(imageProcessor1));
-        controller->addImageProcessor(std::move(imageProcessor2));
+        controller.addImageProcessor(std::move(imageProcessor1));
+        controller.addImageProcessor(std::move(imageProcessor2));
 
-        constexpr auto frameSourcePath{fixtures_path"/images/Lenna.png"};
-        REQUIRE_NOTHROW(controller->loadFrameSourceFrom(frameSourcePath));
+        REQUIRE_NOTHROW(controller.loadFrameSourceFrom(frameSourcePathValue));
 
         WHEN("An observer is registered")
         {
@@ -274,11 +314,11 @@ SCENARIO("Process an image through the pipeline")
             REQUIRE_CALL(*mockObserver, update())
             .LR_SIDE_EFFECT(observerUpdated = true);
 
-            controller->registerObserver(mockObserver);
+            controller.registerObserver(mockObserver);
 
             AND_WHEN("Pipeline processing is fired")
             {
-                controller->firePipelineProcessing();
+                controller.firePipelineProcessing();
 
                 THEN("The observer is notified after the image is processed by all image processors")
                 {
@@ -289,7 +329,7 @@ SCENARIO("Process an image through the pipeline")
 
                     AND_THEN("Pipeline input image can be retrieved")
                     {
-                        const auto inputImage{controller->getCurrentLoadedImage()};
+                        const auto inputImage{controller.getCurrentLoadedImage()};
                         REQUIRE(std::equal(inputImage.begin<uchar>(), inputImage.end<uchar>(),
                                            lennaImage.begin<uchar>()));
                     }
@@ -297,12 +337,12 @@ SCENARIO("Process an image through the pipeline")
                     AND_THEN("The image processors debug image can be retrieved")
                     {
                         constexpr auto processor1Index{0};
-                        const auto debugImageProcessor1{controller->getDebugImage(processor1Index)};
+                        const auto debugImageProcessor1{controller.getDebugImage(processor1Index)};
                         REQUIRE(std::equal(debugImageProcessor1.begin<uchar>(), debugImageProcessor1.end<uchar>(),
                                            dummyDebugImageProcessor1.begin<uchar>()));
 
                         constexpr auto processor2Index{1};
-                        const auto debugImageProcessor2{controller->getDebugImage(processor2Index)};
+                        const auto debugImageProcessor2{controller.getDebugImage(processor2Index)};
                         REQUIRE(std::equal(debugImageProcessor2.begin<uchar>(), debugImageProcessor2.end<uchar>(),
                                            dummyDebugImageProcessor2.begin<uchar>()));
                     }

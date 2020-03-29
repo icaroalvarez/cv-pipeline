@@ -4,7 +4,7 @@
 class FrameSourceFactory
 {
 public:
-    static std::unique_ptr<FrameSource> createAndLoadFromPath(const std::string& path);
+    virtual std::unique_ptr<FrameSource> createAndLoadFromPath(const std::string& path);
 };
 
 

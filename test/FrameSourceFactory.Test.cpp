@@ -7,10 +7,11 @@ SCENARIO("Create frame source")
 {
     GIVEN("A frame source factory")
     {
+        FrameSourceFactory factory;
         THEN("Throws if a frame source is created from a wrong path")
         {
             const std::string sourcePath{"non_existing_path"};
-            CHECK_THROWS_WITH(FrameSourceFactory::createAndLoadFromPath(sourcePath),
+            CHECK_THROWS_WITH(factory.createAndLoadFromPath(sourcePath),
                     "Not able to create frame source from path: "+sourcePath
                     +". Files supported: .jpg, .png, .bmp, .mp4.");
         }
@@ -18,7 +19,7 @@ SCENARIO("Create frame source")
         WHEN("A frame source is created from a valid image path")
         {
             const auto sourcePath{fixtures_path"/images/Lenna.png"};
-            const auto frameSource{FrameSourceFactory::createAndLoadFromPath(sourcePath)};
+            const auto frameSource{factory.createAndLoadFromPath(sourcePath)};
 
             THEN("The frame source type is ImageFrameSource type")
             {
@@ -30,7 +31,7 @@ SCENARIO("Create frame source")
         WHEN("A frame source is created from a valid video path")
         {
             const auto sourcePath{fixtures_path"/video/chaplin.mp4"};
-            const auto frameSource{FrameSourceFactory::createAndLoadFromPath(sourcePath)};
+            const auto frameSource{factory.createAndLoadFromPath(sourcePath)};
 
             THEN("The frame source type is VideoFrameSource type")
             {

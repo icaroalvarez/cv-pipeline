@@ -5,6 +5,7 @@
 #include "Runnable.h"
 #include "FrameSource.h"
 #include "PipelineConfiguration.h"
+#include "FrameSourceFactory.h"
 #include <any>
 #include <opencv2/core/mat.hpp>
 #include <nlohmann/json.hpp>
@@ -20,13 +21,27 @@ class PipelineController: public Notifier, Runnable
 {
 public:
 
+    PipelineController();
+
+    explicit PipelineController(std::unique_ptr<FrameSourceFactory> frameSourceFactory);
+
+    /**
+     * Configure pipeline using pipeline configuration.
+     * @param configuration pipeline configuration
+     */
     void loadPipeline(const PipelineConfiguration& configuration);
 
     /**
-    * Load pipeline configuration from json file (image processors and frame source)
-    * @param configurationFile the configuration file to be loaded
+    * Configure pipeline using pipeline configuration json.
+    * @param configurationFile the configuration json.
     */
     void loadPipelineFromJson(const nlohmann::json& configurationFile);
+
+    /**
+    * Configure pipeline using pipeline configuration json file.
+    * @param configurationFile the configuration json file.
+    */
+    void loadPipelineFromJsonFile(const std::string& path);
 
     /**
      * Get a list of image processors loaded in the pipeline
@@ -100,6 +115,7 @@ public:
     unsigned int getTotalFrames() const;
 
 private:
+    std::unique_ptr<FrameSourceFactory> frameSourceFactory;
     std::vector<std::unique_ptr<ImageProcessor>> imageProcessors;
     Factory<ImageProcessor> imageProcessorFactory;
     cv::Mat currentImage;

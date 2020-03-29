@@ -5,6 +5,16 @@
 #include "easylogging++.h"
 #include "JsonStorage.h"
 
+PipelineController::PipelineController()
+:PipelineController(std::make_unique<FrameSourceFactory>())
+{
+}
+
+PipelineController::PipelineController(std::unique_ptr<FrameSourceFactory> frameSourceFactory)
+:frameSourceFactory{std::move(frameSourceFactory)}
+{
+}
+
 void PipelineController::loadPipeline(const PipelineConfiguration &configuration)
 {
     loadFrameSourceFrom(configuration.frameSourcePath);
@@ -39,6 +49,13 @@ void PipelineController::loadPipelineFromJson(const nlohmann::json &configuratio
     loadPipeline(pipelineConfiguration);
 }
 
+void PipelineController::loadPipelineFromJsonFile(const std::string& path)
+{
+    const auto config = JsonStorage::createPipelineConfigurationFromJsonFile(path);
+    const auto& pipelineConfiguration{JsonStorage::createPipelineConfigurationFromJsonFile(path)};
+    loadPipeline(pipelineConfiguration);
+}
+
 std::vector<std::string> PipelineController::getPipelineDescription() const
 {
     std::vector<std::string> processorNames;
@@ -51,7 +68,7 @@ std::vector<std::string> PipelineController::getPipelineDescription() const
 
 void PipelineController::loadFrameSourceFrom(const std::string &path)
 {
-    frameSource = std::move(FrameSourceFactory::createAndLoadFromPath(path));
+    frameSource = std::move(frameSourceFactory->createAndLoadFromPath(path));
     frameSourcePath = path;
     frameSourceIndex = 0;
 }
