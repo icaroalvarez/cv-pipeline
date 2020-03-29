@@ -10,6 +10,7 @@ set(test_source_files
         VideoFrameSource.Test.cpp
         FrameSourceFactory.Test.cpp
         JsonStorage.Test.cpp
+        PipelineController.Test.cpp
         )
 
 add_executable(test_panoramix
