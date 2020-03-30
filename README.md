@@ -5,9 +5,11 @@ Library tool for testing computer vision image processors.
 ## Installing external dependencies
 
 ### Dependencies managed by conan
-- Catch2
-- Trompeloeil
-- OpenCV
+- [Catch2](https://github.com/catchorg/Catch2)
+- [Trompeloeil](https://github.com/rollbear/trompeloeil)
+- [OpenCV](https://github.com/opencv/opencv)
+- [JSON for Modern C++](https://github.com/nlohmann/json) 
+- [Easylogging++](https://github.com/amrayn/easyloggingpp)
 
 Run the following script for installing the dependencies:
 
@@ -39,7 +41,3 @@ make
 - Template specialization
 - C++17 std::variant and std::visit usage.
 - Nested subprojects with git submodules.
-
-## TODO
-- Add video frame source support (now only single image is supported).
-- Data model that allow saving different pipeline configurations in order to be loaded and used in different executions of the program.

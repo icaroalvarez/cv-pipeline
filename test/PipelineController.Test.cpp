@@ -39,7 +39,7 @@ PipelineConfiguration createPipelineConfiguration()
     return configuration;
 }
 
-SCENARIO("A frame source can be loaded", "[acceptance]")
+SCENARIO("A frame source can be loaded")
 {
     GIVEN("A pipeline controller")
     {
@@ -337,12 +337,12 @@ SCENARIO("Process an image through the pipeline")
                     AND_THEN("The image processors debug image can be retrieved")
                     {
                         constexpr auto processor1Index{0};
-                        const auto debugImageProcessor1{controller.getDebugImage(processor1Index)};
+                        const auto debugImageProcessor1{controller.getDebugImageFrom(processor1Index)};
                         REQUIRE(std::equal(debugImageProcessor1.begin<uchar>(), debugImageProcessor1.end<uchar>(),
                                            dummyDebugImageProcessor1.begin<uchar>()));
 
                         constexpr auto processor2Index{1};
-                        const auto debugImageProcessor2{controller.getDebugImage(processor2Index)};
+                        const auto debugImageProcessor2{controller.getDebugImageFrom(processor2Index)};
                         REQUIRE(std::equal(debugImageProcessor2.begin<uchar>(), debugImageProcessor2.end<uchar>(),
                                            dummyDebugImageProcessor2.begin<uchar>()));
                     }

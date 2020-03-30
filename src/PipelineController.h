@@ -11,18 +11,25 @@
 #include <nlohmann/json.hpp>
 
 /**
- * Responsibility: allows to control the pipeline from the outside (a GUI for example).
+ * Responsibility: allows to control the pipeline from the outside (for example from a GUI).
  * Image processors can be registered and loaded into the pipeline
- * An image can be loaded and processed through the image processors loaded into the pipeline.
+ * A frame source can be loaded (images and videos supported).
  * The image processors loaded into the pipeline can be configured.
- * Post-processed and debug images of each image processor can be retrieved. *
+ * Debug images of each image processor can be retrieved.
  */
 class PipelineController: public Notifier, Runnable
 {
 public:
 
+    /**
+     * Default constructor
+     */
     PipelineController();
 
+    /**
+     * Constructor with frame source factory injection for testing purposes.
+     * @param frameSourceFactory frame source factory dependency to be injected.
+     */
     explicit PipelineController(std::unique_ptr<FrameSourceFactory> frameSourceFactory);
 
     /**
@@ -44,17 +51,15 @@ public:
     void loadPipelineFromJsonFile(const std::string& path);
 
     /**
-     * Get a list of image processors loaded in the pipeline
-     * @return names of the image processors loaded
-     */
-    std::vector<std::string> getPipelineDescription() const;
-
-    /**
      * Load the image to be processed through the pipeline
      * @param path of the image
      */
     void loadFrameSourceFrom(const std::string& path);
 
+    /**
+     * Retrieve current pipeline configuration.
+     * @return current pipeline configuration.
+     */
     PipelineConfiguration getPipelineConfiguration() const;
 
     /**
@@ -99,7 +104,7 @@ public:
      * @param processorIndex the index of the processor in the pipeline
      * @return
      */
-    cv::Mat getDebugImage(unsigned int processorIndex);
+    cv::Mat getDebugImageFrom(unsigned int processorIndex);
 
     /**
      * Register an image processor in order to used when creating pipelines by name
@@ -112,7 +117,12 @@ public:
         imageProcessorFactory.registerMaker<T>(processorName);
     }
 
+    /**
+     * Get frame source total frames
+     * @return frame source total frames
+     */
     unsigned int getTotalFrames() const;
+
 
 private:
     std::unique_ptr<FrameSourceFactory> frameSourceFactory;

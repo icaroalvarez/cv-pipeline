@@ -56,16 +56,6 @@ void PipelineController::loadPipelineFromJsonFile(const std::string& path)
     loadPipeline(pipelineConfiguration);
 }
 
-std::vector<std::string> PipelineController::getPipelineDescription() const
-{
-    std::vector<std::string> processorNames;
-    for (const auto &processor : imageProcessors)
-    {
-        processorNames.push_back(processor->getName());
-    }
-    return processorNames;
-}
-
 void PipelineController::loadFrameSourceFrom(const std::string &path)
 {
     frameSource = std::move(frameSourceFactory->createAndLoadFromPath(path));
@@ -107,7 +97,7 @@ cv::Mat PipelineController::getCurrentLoadedImage()
     return currentImage;
 }
 
-cv::Mat PipelineController::getDebugImage(unsigned int processorIndex)
+cv::Mat PipelineController::getDebugImageFrom(unsigned int processorIndex)
 {
     checkImageProcessorRange(imageProcessors, processorIndex, "Couldn't debug image. ");
     return imageProcessors[processorIndex]->getDebugImage();

@@ -89,61 +89,72 @@ namespace
 
     SCENARIO("Pipeline usage")
     {
-        GIVEN("A pipeline with two image processors and a frame source loaded")
+        GIVEN("A pipeline with two image processors and configuration loaded")
         {
-            auto dummyImagesValueIndex{0};
-            cv::Mat lennaImage{cv::imread(fixtures_path"/images/Lenna.png")};
-            REQUIRE_FALSE(lennaImage.empty());
-
             PipelineController controller;
             controller.registerImageProcessor<Processor1>(processor1Name);
             controller.registerImageProcessor<Processor2>(processor2Name);
-            controller.loadPipeline(createPipelineConfiguration());
 
-            WHEN("An observer is registered")
+            WHEN("Loading pipeline configuration")
             {
-                auto mockObserver{std::make_shared<MockObserver>()};
-                std::atomic_bool observerUpdated{false};
-                REQUIRE_CALL(*mockObserver, update())
-                .LR_SIDE_EFFECT(observerUpdated = true);
+                const auto pipelineConfiguration{createPipelineConfiguration()};
+                REQUIRE_NOTHROW(controller.loadPipeline(pipelineConfiguration));
 
-                controller.registerObserver(mockObserver);
-
-                AND_WHEN("Pipeline processing is fired")
+                THEN("Current pipeline configuration can be retrieved")
                 {
-                    controller.firePipelineProcessing();
+                    const auto currentConfiguration{controller.getPipelineConfiguration()};
+                    CHECK(currentConfiguration == pipelineConfiguration);
 
-                    THEN("The observer is notified after the image is processed by all image processors")
+                    auto dummyImagesValueIndex{0};
+                    cv::Mat lennaImage{cv::imread(fixtures_path"/images/Lenna.png")};
+                    REQUIRE_FALSE(lennaImage.empty());
+
+                    WHEN("An observer is registered")
                     {
-                        while (!observerUpdated)
-                        {
-                            std::this_thread::sleep_for(std::chrono::microseconds(100));
-                        }
+                        auto mockObserver{std::make_shared<MockObserver>()};
+                        std::atomic_bool observerUpdated{false};
+                        REQUIRE_CALL(*mockObserver, update())
+                        .LR_SIDE_EFFECT(observerUpdated = true);
 
-                        AND_THEN("Pipeline input image can be retrieved")
-                        {
-                            const auto inputImage{controller.getCurrentLoadedImage()};
-                            REQUIRE(std::equal(inputImage.begin<uchar>(), inputImage.end<uchar>(),
-                                               lennaImage.begin<uchar>()));
-                        }
+                        controller.registerObserver(mockObserver);
 
-                        AND_THEN("The image processors debug image can be retrieved")
+                        AND_WHEN("Pipeline processing is fired")
                         {
-                            constexpr auto processor1Index{0};
-                            const auto debugImageProcessor1{controller.getDebugImage(processor1Index)};
-                            auto path{fixtures_path"/images/acceptance_debug_processor_1.png"};
-                            //cv::imwrite(path, debugImageProcessor1);
-                            auto expectedImage{cv::imread(path)};
-                            REQUIRE(std::equal(debugImageProcessor1.begin<uchar>(), debugImageProcessor1.end<uchar>(),
-                                               expectedImage.begin<uchar>()));
+                            controller.firePipelineProcessing();
 
-                            constexpr auto processor2Index{1};
-                            const auto debugImageProcessor2{controller.getDebugImage(processor2Index)};
-                            path = fixtures_path"/images/acceptance_debug_processor_2.png";
-                            //cv::imwrite(path, debugImageProcessor2);
-                            expectedImage = cv::imread(path);
-                            REQUIRE(std::equal(debugImageProcessor2.begin<uchar>(), debugImageProcessor2.end<uchar>(),
-                                               expectedImage.begin<uchar>()));
+                            THEN("The observer is notified after the image is processed by all image processors")
+                            {
+                                while (!observerUpdated)
+                                {
+                                    std::this_thread::sleep_for(std::chrono::microseconds(100));
+                                }
+
+                                AND_THEN("Pipeline input image can be retrieved")
+                                {
+                                    const auto inputImage{controller.getCurrentLoadedImage()};
+                                    REQUIRE(std::equal(inputImage.begin<uchar>(), inputImage.end<uchar>(),
+                                                       lennaImage.begin<uchar>()));
+                                }
+
+                                AND_THEN("The image processors debug images can be retrieved")
+                                {
+                                    constexpr auto processor1Index{0};
+                                    const auto debugImageProcessor1{controller.getDebugImageFrom(processor1Index)};
+                                    auto path{fixtures_path"/images/acceptance_debug_processor_1.png"};
+                                    //cv::imwrite(path, debugImageProcessor1);
+                                    auto expectedImage{cv::imread(path)};
+                                    REQUIRE(std::equal(debugImageProcessor1.begin<uchar>(), debugImageProcessor1.end<uchar>(),
+                                                       expectedImage.begin<uchar>()));
+
+                                    constexpr auto processor2Index{1};
+                                    const auto debugImageProcessor2{controller.getDebugImageFrom(processor2Index)};
+                                    path = fixtures_path"/images/acceptance_debug_processor_2.png";
+                                    //cv::imwrite(path, debugImageProcessor2);
+                                    expectedImage = cv::imread(path);
+                                    REQUIRE(std::equal(debugImageProcessor2.begin<uchar>(), debugImageProcessor2.end<uchar>(),
+                                                       expectedImage.begin<uchar>()));
+                                }
+                            }
                         }
                     }
                 }
