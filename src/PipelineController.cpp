@@ -184,3 +184,9 @@ PipelineConfiguration PipelineController::getPipelineConfiguration() const
     }
     return pipelineConfiguration;
 }
+
+void PipelineController::savePipelineConfigurationTo(const std::string &path) const
+{
+    const auto configuration{getPipelineConfiguration()};
+    JsonStorage::saveProcessorConfigurationTo(configuration, path);
+}

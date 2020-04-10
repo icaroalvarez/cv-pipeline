@@ -123,6 +123,12 @@ public:
      */
     unsigned int getTotalFrames() const;
 
+    /**
+     * Save current pipeline configuration to a json file
+     * @param path json file path to save current pipeline configuration
+     */
+    void savePipelineConfigurationTo(const std::string& path) const;
+
 
 private:
     std::unique_ptr<FrameSourceFactory> frameSourceFactory;
