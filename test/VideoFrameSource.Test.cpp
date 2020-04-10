@@ -52,6 +52,20 @@ SCENARIO("Loads a video frame source")
                     CHECK(std::equal(frame.begin<uchar>(), frame.end<uchar>(), chaplinFrame.begin<uchar>()));
                 }
             }
+
+            THEN("The same image index can be retrieved continuously")
+            {
+                constexpr auto frameIndex{0};
+                auto totalTimes{3};
+                while(totalTimes --> 0)
+                {
+                    const auto frame{frameSource.getFrameFromIndex(frameIndex)};
+                    const auto framePath{fixtures_path"images/chaplin/chaplin_frame_"
+                                         +std::to_string(frameIndex)+".bmp"};
+                    const auto chaplinFrame{cv::imread(framePath)};
+                    CHECK(std::equal(frame.begin<uchar>(), frame.end<uchar>(), chaplinFrame.begin<uchar>()));
+                }
+            }
         }
     }
 }

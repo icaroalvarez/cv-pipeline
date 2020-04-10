@@ -16,6 +16,7 @@ private:
     unsigned int totalFrames{0};
     unsigned int prevFrameIndex{0};
     std::string path;
+    cv::Mat lastLoadedFrame;
 };
 
 

@@ -35,18 +35,25 @@ cv::Mat VideoFrameSource::getFrameFromIndex(unsigned int index)
         throw std::invalid_argument("Unable to get frame from index "+std::to_string(index)
         +". Index is out of bound (max index is "+std::to_string(totalFrames-1)+")");
     }
-    const auto setIndexNecessary{(index not_eq 0) and (prevFrameIndex not_eq (index-1))};
+
+    const auto indexEqualsPrev{index == prevFrameIndex};
+    if(indexEqualsPrev and not lastLoadedFrame.empty())
+    {
+        return lastLoadedFrame;
+    }
+
+    const auto firstFrame{lastLoadedFrame.empty()};
+    const auto indexIsNotContinuous{index not_eq prevFrameIndex+1};
     prevFrameIndex = index;
-    if(setIndexNecessary)
+    if(not firstFrame and indexIsNotContinuous)
     {
         videoCapture.set(cv::CAP_PROP_POS_FRAMES, index);
     }
 
-    cv::Mat image;
-    videoCapture.read(image);
-    if(not videoCapture.read(image))
+    videoCapture.read(lastLoadedFrame);
+    if(not videoCapture.read(lastLoadedFrame))
     {
         throw std::runtime_error("Error while reading image from: "+path);
     }
-    return image;
+    return lastLoadedFrame;
 }
