@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(Panoramix)
+project(CvPipeline)
 set(CMAKE_CXX_STANDARD 17)
 message("CMake build type: " ${CMAKE_BUILD_TYPE})
 

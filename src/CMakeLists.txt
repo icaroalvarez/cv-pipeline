@@ -15,11 +15,11 @@ set(source_files
         PipelineConfiguration
         JsonStorage)
 
-add_library(panoramix
+add_library(cv-pipeline
         ${source_files}
         )
 
-target_link_libraries(panoramix
+target_link_libraries(cv-pipeline
         PRIVATE
             pthread
         PUBLIC
@@ -29,6 +29,6 @@ target_link_libraries(panoramix
             stdc++fs
         )
 
-target_include_directories(panoramix PUBLIC
+target_include_directories(cv-pipeline PUBLIC
         ../src
 )

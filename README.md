@@ -1,6 +1,6 @@
-# Panoramix - Test playground for your image processors.
+# CV-Pipeline - Computer Vision Pipeline.
 
-Library tool for testing computer vision image processors. 
+Process images through a pipeline of image processors. Configure and tune the processors and see the result in real time. 
 
 ## Installing external dependencies
 
@@ -31,13 +31,11 @@ make
 ```
 
 ## Technical Features
-- Modern C++11/14/17.
-- Testing witch Catch2 and mocking with Trompeloeil.
+- Modern C++17 (std::variant, std::visit).
+- Testing and mocking with Catch2 and Trompeloeil frameworks.
 - Testing coverage using lcov. 
 - Acceptance Test Driven Development (ATDD) and Behavior-Driven Development (BDD).
 - Build system with Modern CMake.
 - Conan as dependency manager.
 - Multi-threading synchronization with condition variables.
 - Template specialization
-- C++17 std::variant and std::visit usage.
-- Nested subprojects with git submodules.
