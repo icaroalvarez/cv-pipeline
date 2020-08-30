@@ -30,6 +30,10 @@ cmake ..
 make
 ```
 
+## Using image processor pipeline
+- [Create your own custom image processors](doc/create_custom_image_processor.md) or use [the ones already created](https://github.com/icaroalvarez/image-processors).
+- [Execute pipeline processing](doc/execute_pipeline.md)
+
 ## Technical Features
 - Modern C++17 (std::variant, std::visit).
 - Testing and mocking with Catch2 and Trompeloeil frameworks.
