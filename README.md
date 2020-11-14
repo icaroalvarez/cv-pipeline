@@ -14,7 +14,8 @@ Process images through a pipeline of image processors. Configure and tune the pr
 Run the following script for installing the dependencies:
 
 ```bash
-sh conan_install.sh
+mkdir .conan && cd .conan
+conan install ..
 ```
 
 ## Building the project
