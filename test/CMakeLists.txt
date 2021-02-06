@@ -11,6 +11,7 @@ set(test_source_files
         FrameSourceFactory.Test.cpp
         JsonStorage.Test.cpp
         PipelineController.Test.cpp
+        ImageProcessors/Mosaic.Test.cpp
         )
 
 add_executable(test-cv-pipeline

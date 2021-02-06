@@ -15,8 +15,24 @@ set(source_files
         PipelineConfiguration
         JsonStorage)
 
+set(image_processor_sources
+        ImageProcessors/ResizeImage
+        ImageProcessors/Roi
+        ImageProcessors/Mosaic
+        ImageProcessors/Registerer
+        ImageProcessors/ColorSpace
+        ImageProcessors/Convolution
+        ImageProcessors/threshold/AdaptiveThreshold
+        ImageProcessors/threshold/Percentile
+        ImageProcessors/threshold/Threshold
+        ImageProcessors/GaborFilter
+        ImageProcessors/CannyEdgeDetector
+        ImageProcessors/HoughLines
+        ImageProcessors/Utils)
+
 add_library(cv-pipeline
         ${source_files}
+        ${image_processor_sources}
         )
 
 target_link_libraries(cv-pipeline
